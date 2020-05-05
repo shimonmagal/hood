@@ -55,23 +55,7 @@ class MyAppState extends State<MyApp> {
   }
   
   @override
-  Widget build(BuildContext ctx) {
-    
- 
-   // List flyers = new List();
-    
-   // for (int i = 0; i < 100; i++) {
-   //   String image = null;
-      
-   //   if (i % 2 == 0) {
-   //     image = 'https://www.handletheheat.com/wp-content/uploads/2015/03/Best-Birthday-Cake-with-milk-chocolate-buttercream-SQUARE.jpg';
-   //   } else {
-   //     image = 'https://api.time.com/wp-content/uploads/2019/11/top-10-fiction-2019.jpg';
-   //   }
-      
-   //   flyers.add(Flyer('Item $i', 'The item number $i', image));
-   //}
-    
+  Widget build(BuildContext BuildContext) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -83,32 +67,7 @@ class MyAppState extends State<MyApp> {
             if (snapshot.hasData) {
               List<Flyer> flyers = snapshot.data;
               
-              return GridView.count(
-                crossAxisCount: 3,
-                crossAxisSpacing: 4.0,
-                mainAxisSpacing: 8.0,
-                children: List.generate(flyers.length, (index) {
-                  return InkWell(
-                    child: Column(
-                      children: <Widget>[
-                        Expanded(
-                          child: Image.network(flyers[index].imageUrl)
-                        ),
-                        Expanded(
-                          child: Text(flyers[index].title,
-                            style: Theme.of(ctx).textTheme.caption,
-                          ),
-                        ),
-                      ],
-                    ),
-                    onTap: () {
-                      Navigator.of(ctx).push(
-                        MaterialPageRoute(builder: (ctx) => FlyerView(flyers[index]))
-                      );
-                    }
-                  );
-                }
-              ));
+              return FlyersView(flyers);
             }
             
             return CircularProgressIndicator();
@@ -116,6 +75,41 @@ class MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+}
+
+class FlyersView extends StatelessWidget {
+  final List<Flyer> flyers;
+  
+  FlyersView(this.flyers);
+  
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 3,
+      crossAxisSpacing: 4.0,
+      mainAxisSpacing: 8.0,
+      children: List.generate(flyers.length, (index) {
+        return InkWell(
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: Image.network(flyers[index].imageUrl)
+              ),
+              Expanded(
+                child: Text(flyers[index].title,
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              ),
+            ],
+          ),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => FlyerView(flyers[index]))
+            );
+          }
+        );
+      }
+    ));
   }
 }
 
