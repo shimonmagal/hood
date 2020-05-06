@@ -43,4 +43,14 @@ public class FlyersApi
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
+	
+	@POST
+	public Response addFlyer()
+	{
+		System.out.println("Add flyer called");
+		
+		return Response
+			.status(Response.Status.OK)
+			.build();
+	}
 }
