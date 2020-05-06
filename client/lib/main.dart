@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(MyApp());
@@ -160,7 +161,7 @@ class AddFlyerForm extends StatefulWidget {
 
 class AddFlyerFormState extends State<AddFlyerForm> {
   final _formKey = GlobalKey<FormState>();
-  String existingPhotoUrl;
+  File _image;
   
   @override
   Widget build(BuildContext context) {
@@ -168,53 +169,71 @@ class AddFlyerFormState extends State<AddFlyerForm> {
       appBar: AppBar(title: Text('Add Flyer')), 
       body: Form(
         key: _formKey,
-        child: Column(
-          children: <Widget>[
-            TextFormField(
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter title';
-                }
-                
-                return null;
-              },
-              decoration: const InputDecoration(
-                icon: const Icon(Icons.title),
-                hintText: 'Enter the title'
-              ),
-            ),
-            TextFormField(
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter description';
-                }
-                
-                return null;
-              },
-              decoration: const InputDecoration(
-                icon: const Icon(Icons.description),
-                hintText: 'Enter description'
-              ),
-            ),
-
-            //FormField<String>(
-            //  builder:
-            //),
-            
-            new Container(
-              padding: const EdgeInsets.only(left: 40.0, top: 20.0),
-              child: RaisedButton(
-                child: Text('Add Flyer'),
-                onPressed: () {
-                  if (_formKey.currentState.validate()) {
-                    print ("Pressed");
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              TextFormField(
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please enter title';
                   }
-                }
+                  
+                  return null;
+                },
+                decoration: const InputDecoration(
+                  icon: const Icon(Icons.title),
+                  hintText: 'Enter the title'
+                ),
               ),
-            ),
-          ]
+              TextFormField(
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please enter description';
+                  }
+                  
+                  return null;
+                },
+                decoration: const InputDecoration(
+                  icon: const Icon(Icons.description),
+                  hintText: 'Enter description'
+                ),
+              ),
+              FormField<String>(
+                builder: (context) => Column(
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.all(10.0),
+                      child: _image == null ? Text('No image selected.') : Image.file(_image, height: 300.0),
+                    ),
+                    RaisedButton(
+                      child: Text('Choose an image...'),
+                      onPressed: getImage,
+                    )
+                  ]
+                )
+              ),
+              new Container(
+                padding: const EdgeInsets.only(left: 40.0, top: 20.0),
+                child: RaisedButton(
+                  child: Text('Add Flyer'),
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      print ("Pressed");
+                    }
+                  }
+                ),
+              ),
+            ]
+          ),
         )
       ),
     );
+  }
+  
+  Future<void> getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = image;
+    });
   }
 }
