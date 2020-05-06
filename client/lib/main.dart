@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 void main() {
   runApp(MyApp());
@@ -161,10 +162,37 @@ class AddFlyerForm extends StatefulWidget {
 
 class AddFlyerFormState extends State<AddFlyerForm> {
   final _formKey = GlobalKey<FormState>();
+  final _title = TextEditingController();
+  final _description = TextEditingController();
   File _image;
+  String _errorStatus;
+  ProgressDialog pr;
+  
+  @override
+  void dispose() {
+    _title.dispose();
+    _description.dispose();
+    super.dispose();
+  }
   
   @override
   Widget build(BuildContext context) {
+    pr = new ProgressDialog(context);
+    pr.style(
+      message: 'Uploading flyer...',
+      borderRadius: 10.0,
+      backgroundColor: Colors.white,
+      progressWidget: CircularProgressIndicator(),
+      elevation: 10.0,
+      insetAnimCurve: Curves.easeInOut,
+      progress: 0.0,
+      maxProgress: 100.0,
+      progressTextStyle: TextStyle(
+        color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
+      messageTextStyle: TextStyle(
+        color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600)
+    );
+    
     return Scaffold(
       appBar: AppBar(title: Text('Add Flyer')), 
       body: Form(
@@ -173,6 +201,7 @@ class AddFlyerFormState extends State<AddFlyerForm> {
           child: Column(
             children: <Widget>[
               TextFormField(
+                controller: _title,
                 validator: (value) {
                   if (value.isEmpty) {
                     return 'Please enter title';
@@ -186,6 +215,7 @@ class AddFlyerFormState extends State<AddFlyerForm> {
                 ),
               ),
               TextFormField(
+                controller: _description,
                 validator: (value) {
                   if (value.isEmpty) {
                     return 'Please enter description';
@@ -217,17 +247,60 @@ class AddFlyerFormState extends State<AddFlyerForm> {
                 child: RaisedButton(
                   child: Text('Add Flyer'),
                   onPressed: () {
-                    if (_formKey.currentState.validate()) {
-                      print ("Pressed");
+                    if (!_formKey.currentState.validate()) {
+                      return;
                     }
+                    
+                    sendFlyer(_title.text, _description.text, _image);
                   }
                 ),
               ),
+              Visibility(
+                child: Text("$_errorStatus",
+                  style: TextStyle(color: Colors.red),
+                ),
+                visible: _errorStatus != null
+              )
             ]
           ),
         )
       ),
     );
+  }
+  
+  void sendFlyer(String title, String description, File image) async {
+    await pr.show();
+    
+    try {
+      final response = await http.post('http://10.0.2.2:8080/api/flyers',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'title': title,
+          'description': description,
+          'imageUrl': 'TBD'
+        }),
+      );
+      
+      if (response.statusCode != 200) {
+        await pr.hide();
+        setState(() {
+          _errorStatus = "Error saving flyer: ${response.statusCode}";
+        });
+        return;
+      }
+      
+      pr.hide().whenComplete(() {
+        Navigator.of(context).pop();
+      });
+    } catch (e) {
+      await pr.hide();
+      setState(() {
+        _errorStatus = "Error saving flyer: ${e}";
+      });
+      print("ERROR: $e");
+    }
   }
   
   Future<void> getImage() async {

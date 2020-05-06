@@ -18,7 +18,7 @@ public class FlyersApi
 	private static final Logger logger = LoggerFactory.getLogger(FlyersApi.class);
 	
 	@GET
-	@Consumes("text/plain")
+	
 	public Response getFlyters()
 	{
 		try
@@ -42,5 +42,16 @@ public class FlyersApi
 			logger.error("Error getting flyers", e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
+	}
+	
+	@POST
+	@Consumes({MediaType.APPLICATION_JSON})
+	public Response addFlyer(Flyer flyer)
+	{
+		System.out.println("Add flyer called " + flyer);
+		
+		return Response
+			.status(Response.Status.OK)
+			.build();
 	}
 }

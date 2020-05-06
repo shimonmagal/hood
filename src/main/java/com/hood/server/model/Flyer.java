@@ -27,4 +27,9 @@ public class Flyer
 	{
 		return imageUrl;
 	}
+	
+	public String toString()
+	{
+		return String.format("(title: %s) (description: %s) (image: %s)", title, description, imageUrl);
+	}
 }
