@@ -13,6 +13,8 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
 
+import com.hood.server.services.DBInterface;
+
 public class HoodServer
 {
 	private static final int DEFAULT_PORT = 8080;
@@ -21,6 +23,11 @@ public class HoodServer
 	
 	public static void main(String[] args) throws Exception
 	{
+		if (DBInterface.get() == null)
+		{
+			return;
+		}
+		
 		int port = DEFAULT_PORT;
 		
 		if (args.length > 0)

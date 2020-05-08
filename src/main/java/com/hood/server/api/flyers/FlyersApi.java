@@ -2,9 +2,12 @@ package com.hood.server.flyers;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.bson.Document;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -13,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.databind.ObjectMapper; 
 
+import com.hood.server.services.DBInterface;
 import com.hood.server.model.Flyer;
 
 @Path("flyers")
@@ -25,11 +29,16 @@ public class FlyersApi
 	{
 		try
 		{
-			List<Flyer> flyers = new ArrayList<Flyer>();
+			List<Document> documents = DBInterface.get().getAllDocuments("flyers");
 			
-			flyers.add(new Flyer("Delicious cake", "Made by a bunch of titan robots", "https://i.pinimg.com/originals/c8/a9/8c/c8a98c21623f40cdb723f4b43b73bbc8.png"));
-			flyers.add(new Flyer("Guitar lessons", "The best guitar lessons in the world, the teacher have a mustache", "https://media.gettyimages.com/photos/cowboy-man-with-guitar-mustache-and-cowboy-hat-picture-id140140339"));
-			flyers.add(new Flyer("Lost cat", "White cat has gone since yesterday", "https://www.petsworld.in/blog/wp-content/uploads/2014/09/Ragdoll1.jpg"));
+			if (documents == null)
+			{
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
+			
+			List<Flyer> flyers = documents.stream()
+				.map(doc -> Flyer.fromBsonObject(doc))
+				.collect(Collectors.toList());
 			
 			ObjectMapper jsonMapper = new ObjectMapper(); 
 			String resultJson = jsonMapper.writeValueAsString(flyers);
