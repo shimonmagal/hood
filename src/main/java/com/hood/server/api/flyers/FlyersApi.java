@@ -1,15 +1,18 @@
 package com.hood.server.flyers;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.*;
-import java.util.*;
-import java.nio.file.StandardCopyOption;
 import com.fasterxml.jackson.databind.ObjectMapper; 
+
 import com.hood.server.model.Flyer;
 
 @Path("flyers")
@@ -18,7 +21,6 @@ public class FlyersApi
 	private static final Logger logger = LoggerFactory.getLogger(FlyersApi.class);
 	
 	@GET
-	
 	public Response getFlyters()
 	{
 		try
@@ -45,13 +47,23 @@ public class FlyersApi
 	}
 	
 	@POST
-	@Consumes({MediaType.APPLICATION_JSON})
-	public Response addFlyer(Flyer flyer)
+	public Response addFlyer(String flyerJson)
 	{
-		System.out.println("Add flyer called " + flyer);
-		
-		return Response
-			.status(Response.Status.OK)
-			.build();
+		try
+		{
+			ObjectMapper jsonMapper = new ObjectMapper(); 
+			Flyer flyer = jsonMapper.readValue(flyerJson, Flyer.class); 
+			
+			System.out.println("Add flyer called " + flyer);
+			
+			return Response
+				.status(Response.Status.OK)
+				.build();
+		}
+		catch (Exception e)
+		{
+			logger.error("Error adding flyer", e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}	
 	}
 }

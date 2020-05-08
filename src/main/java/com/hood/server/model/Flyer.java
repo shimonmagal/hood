@@ -1,5 +1,9 @@
 package com.hood.server.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+
+@JsonDeserialize(builder = Flyer.Builder.class)
 public class Flyer
 {
 	private final String title;
@@ -31,5 +35,36 @@ public class Flyer
 	public String toString()
 	{
 		return String.format("(title: %s) (description: %s) (image: %s)", title, description, imageUrl);
+	}
+	
+	@JsonPOJOBuilder
+	public static class Builder
+	{
+		private String title;
+		private String description;
+		private String imageUrl;
+		
+		public Builder withTitle(String title)
+		{
+			this.title = title;
+			return this;
+		}
+		
+		public Builder withDescription(String description)
+		{
+			this.description = description;
+			return this;
+		}
+		
+		public Builder withImageUrl(String imageUrl)
+		{
+			this.imageUrl = imageUrl;
+			return this;
+		}
+		
+		public Flyer build()
+		{
+			return new Flyer(title, description, imageUrl);
+		}
 	}
 }
