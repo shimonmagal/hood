@@ -3,7 +3,7 @@ package com.hood.server.api;
 import com.hood.server.api.auth.AuthenticationFilter;
 import com.hood.server.api.report.Report;
 import com.hood.server.api.auth.LoginApi;
-import com.hood.server.flyers.FlyersApi;
+import com.hood.server.api.flyers.FlyersApi;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import javax.ws.rs.core.Application;

@@ -1,4 +1,4 @@
-package com.hood.server.flyers;
+package com.hood.server.api.flyers;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -12,7 +12,6 @@ import org.bson.Document;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.databind.ObjectMapper; 
 
