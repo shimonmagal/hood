@@ -8,7 +8,9 @@
             </Pattern>
         </layout>
     </appender>
-
+    
+    <logger name="org.mongodb.driver" level="INFO"/>
+    
     <root level="debug">
         <appender-ref ref="CONSOLE"/>
     </root>
