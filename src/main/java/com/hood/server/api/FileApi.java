@@ -1,19 +1,20 @@
 package com.hood.server.api;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
+import java.io.InputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.*;
-import java.nio.file.StandardCopyOption;
+
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+
+import com.hood.server.services.BlobInterface;
 
 @Path("file")
 public class FileApi
@@ -22,32 +23,28 @@ public class FileApi
 	
 	@PUT
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public Response upload(@FormDataParam("file") InputStream fileInputStream,
-			@FormDataParam("file") FormDataContentDisposition disposition)
+	public Response upload(@FormDataParam("file") InputStream inputStream)
 	{
-		File targetFile = new File("/tmp/" + disposition.getFileName());
-		
 		try
 		{
-			java.nio.file.Files.copy(
-					fileInputStream,
-					targetFile.toPath(),
-					StandardCopyOption.REPLACE_EXISTING);
+			String fileKey = BlobInterface.get().putNew(inputStream);
 			
-			Workbook workbook = WorkbookFactory.create(targetFile);
-			Sheet sheet = workbook.getSheetAt(0);
+			if (fileKey == null)
+			{
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
+			
+			logger.info("File uploaded: {}", fileKey);
+			
+			return Response
+				.status(Response.Status.OK)
+				.entity(fileKey)
+				.build();
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
-			logger.error("Error while uploading excel: " + disposition.getFileName(), e);
-			return Response.status(500).entity("Exception occured").build();
+			logger.error("Error uploading file", e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
-		catch (InvalidFormatException e)
-		{
-			logger.error("Error while uploading excel: " + disposition.getFileName(), e);
-			return Response.status(500).entity("Exception occured").build();
-		}
-		
-		return Response.status(200).build();
 	}
 }
