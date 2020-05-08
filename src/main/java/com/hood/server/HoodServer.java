@@ -14,6 +14,7 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 
 import com.hood.server.services.DBInterface;
+import com.hood.server.services.BlobInterface;
 
 public class HoodServer
 {
@@ -24,6 +25,11 @@ public class HoodServer
 	public static void main(String[] args) throws Exception
 	{
 		if (DBInterface.get() == null)
+		{
+			return;
+		}
+		
+		if (BlobInterface.get() == null)
 		{
 			return;
 		}
