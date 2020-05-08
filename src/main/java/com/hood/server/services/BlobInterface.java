@@ -1,6 +1,9 @@
 package com.hood.server.services;
 
 import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +51,23 @@ public class BlobInterface
 		this.storageDirectory = storageDirectory;
 	}
 	
-	public boolean put(String key, byte[] value)
+	public String putNew(InputStream inputStream)
 	{
-		return false;
+		String newObjectKey = UUID.randomUUID().toString();
+		File targetFile = new File(storageDirectory, newObjectKey);
+		
+		try
+		{
+			Files.copy(
+				inputStream,
+				targetFile.toPath());
+			
+			return newObjectKey;
+		}
+		catch (Exception e)
+		{
+			logger.error("Error putting blob file: {}", targetFile, e);
+			return null;
+		}
 	}
 }
