@@ -1,4 +1,4 @@
-package com.example.dude
+package com.hood.hood
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
