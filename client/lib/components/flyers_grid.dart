@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hood/model/flyer.dart';
 import 'package:hood/screens/flyer_viewer_screen.dart';
+import 'package:hood/services/blob_services.dart';
 
 class FlyersGrid extends StatelessWidget {
   final List<Flyer> flyers;
@@ -17,7 +18,7 @@ class FlyersGrid extends StatelessWidget {
           child: Column(
             children: <Widget>[
               Expanded(
-                child: Image.network("http://10.0.2.2:8080/api/file?key=${flyers[index].imageKey}")
+                child: Image.network(BlobServices.getBlobUrl(flyers[index].imageKey))
               ),
               Expanded(
                 child: Text(flyers[index].title,
