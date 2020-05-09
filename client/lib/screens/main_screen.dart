@@ -14,13 +14,11 @@ class MainScreen extends StatefulWidget {
 
 class MainScreenState extends State<MainScreen> {
   Future<List<Flyer>> flyers;
-  bool loggedIn = false;
   
   @override
   void initState() {
     super.initState();
     flyers = FlyerServices.fetchFlyers();
-    loggedIn = false;
   }
   
   @override
@@ -32,11 +30,7 @@ class MainScreenState extends State<MainScreen> {
         body: FutureBuilder(
           future: flyers,
           builder: (context, snapshot) {
-            if (this.loggedIn == false)
-            {
-                return LoginView(this);
-            }
-            else if (snapshot.hasData) {
+            if (snapshot.hasData) {
               List<Flyer> flyers = snapshot.data;
               
               return FlyersGrid(flyers);

@@ -4,34 +4,27 @@ import 'package:hood/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 
 class LoginView extends StatefulWidget {
-  final MainScreenState parent;
-
-  LoginView(this.parent);
-
   @override
   State<StatefulWidget> createState() {
-    return LoginViewState(this.parent);
+    return LoginViewState();
   }
 }
 
 enum LOGIN_TYPES { NONE, GOOGLE, FACEBOOK }
 
 class LoginViewState extends State<LoginView> {
-  final MainScreenState parent;
   LOGIN_TYPES loginType = LOGIN_TYPES.NONE;
-
-  LoginViewState(this.parent);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
-            body: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[FacebookLoginView(this), GoogleLoginView(this)],
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[FacebookLoginView(this), GoogleLoginView(this)],
+        ),
       ),
-    )));
+    );
   }
 
   logIn(LOGIN_TYPES loginType) {
@@ -40,15 +33,11 @@ class LoginViewState extends State<LoginView> {
     });
   }
 
-  goToApp() {
-    this.parent.setState(() {
-      this.parent.loggedIn = true;
-    });
+  goToApp(context) {
+    Navigator.pushNamed(context, '/');
   }
 
-  logOut() {
-    this.parent.setState(() {
-      this.parent.loggedIn = false;
-    });
+  logOut(context) {
+    Navigator.pushNamed(context, '/login');
   }
 }

@@ -25,7 +25,7 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
 
   GoogleLoginViewState(this.parent);
 
-  _loginWithGoogle() async {
+  _loginWithGoogle(context) async {
     final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
 
     if (googleSignInAccount == null) {
@@ -39,7 +39,7 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
         'http://10.0.2.2:8080/api/google?id_token=${googleSignInAuthentication.idToken}');
 
     if (serverResponse.statusCode != 200) {
-      this.parent.logOut();
+      this.parent.logOut(context);
 
       return;
     }
@@ -53,10 +53,10 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
     this.parent.logIn(LOGIN_TYPES.GOOGLE);
   }
 
-  _logout() {
+  _logout(context) {
     googleSignIn.signOut();
 
-    this.parent.logOut();
+    this.parent.logOut(context);
   }
 
   @override
@@ -74,12 +74,12 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
                 OutlineButton(
                     child: Text("Continue to app >>"),
                     onPressed: () {
-                      this.parent.goToApp();
+                      this.parent.goToApp(context);
                     }),
                 OutlineButton(
                   child: Text("Logout"),
                   onPressed: () {
-                    _logout();
+                    _logout(context);
                   },
                 )
               ],
@@ -90,7 +90,7 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
                   : OutlineButton(
                       child: GoogleSignInButton(
                         onPressed: () {
-                          _loginWithGoogle();
+                          _loginWithGoogle(context);
                         },
                       ),
                     ),

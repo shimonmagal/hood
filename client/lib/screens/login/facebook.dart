@@ -23,7 +23,7 @@ class FacebookLoginViewState extends State<FacebookLoginView> {
 
   FacebookLoginViewState(this.parent);
 
-  _loginWithFB() async {
+  _loginWithFB(context) async {
     final result = await facebookLogin.logInWithReadPermissions(['email']);
 
     switch (result.status) {
@@ -34,12 +34,12 @@ class FacebookLoginViewState extends State<FacebookLoginView> {
             .get('http://10.0.2.2:8080/api/facebook?access_token=${token}');
 
         if (serverResponse.statusCode != 200) {
-          this.parent.logOut();
+          this.parent.logOut(context);
           return;
         }
 
         final profile = jsonDecode(serverResponse.body);
-
+        
         setState(() {
           userProfile = profile;
         });
@@ -51,17 +51,17 @@ class FacebookLoginViewState extends State<FacebookLoginView> {
         break;
 
       case FacebookLoginStatus.cancelledByUser:
-        this.parent.logOut();
+        this.parent.logOut(context);
         break;
       case FacebookLoginStatus.error:
-        this.parent.logOut();
+        this.parent.logOut(context);
         break;
     }
   }
 
-  _logout() {
+  _logout(context) {
     facebookLogin.logOut();
-    this.parent.logOut();
+    this.parent.logOut(context);
   }
 
   @override
@@ -79,12 +79,12 @@ class FacebookLoginViewState extends State<FacebookLoginView> {
                 OutlineButton(
                     child: Text("Continue to app >>"),
                     onPressed: () {
-                      this.parent.goToApp();
+                      this.parent.goToApp(context);
                     }),
                 OutlineButton(
                   child: Text("Logout"),
                   onPressed: () {
-                    _logout();
+                    _logout(context);
                   },
                 )
               ],
@@ -95,7 +95,7 @@ class FacebookLoginViewState extends State<FacebookLoginView> {
                   : OutlineButton(
                       child: FacebookSignInButton(
                         onPressed: () {
-                          _loginWithFB();
+                          _loginWithFB(context);
                         },
                       ),
                     ),
