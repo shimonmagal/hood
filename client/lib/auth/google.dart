@@ -1,92 +1,100 @@
 import 'package:dude/auth/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:convert';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 
-class FacebookLoginView extends StatefulWidget{
+class GoogleLoginView extends StatefulWidget {
   final LoginViewState parent;
 
-  FacebookLoginView(this.parent);
+  GoogleLoginView(this.parent);
 
   @override
   State<StatefulWidget> createState() {
-    return FacebookLoginViewState(this.parent);
+    return GoogleLoginViewState(this.parent);
   }
 }
 
-class FacebookLoginViewState extends State<FacebookLoginView> {
+class GoogleLoginViewState extends State<GoogleLoginView> {
   Map userProfile;
-  final facebookLogin = FacebookLogin();
+  final GoogleSignIn googleSignIn = GoogleSignIn(
+    scopes: ['email'],
+  );
   final LoginViewState parent;
 
-  FacebookLoginViewState(this.parent);
+  GoogleLoginViewState(this.parent);
 
-  _loginWithFB() async{
-    final result = await facebookLogin.logInWithReadPermissions(['email']);
+  _loginWithGoogle() async {
+    final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
 
-    switch (result.status) {
-      case FacebookLoginStatus.loggedIn:
-        final token = result.accessToken.token;
-
-        final serverResponse = await http.get('http://10.0.2.2:8080/api/facebook?access_token=${token}');
-
-        final profile = jsonDecode(serverResponse.body);
-
-        setState(() {
-          userProfile = profile;
-        });
-        this.parent.setState(() {
-          this.parent.isLoggedIn = true;
-        });
-
-        break;
-
-      case FacebookLoginStatus.cancelledByUser:
-        this.parent.setState(() => this.parent.isLoggedIn = false );
-        break;
-      case FacebookLoginStatus.error:
-        this.parent.setState(() => this.parent.isLoggedIn = false );
-        break;
+    if (googleSignInAccount == null) {
+      return;
     }
 
+    final GoogleSignInAuthentication googleSignInAuthentication =
+        await googleSignInAccount.authentication;
+
+    final serverResponse = await http.get(
+        'http://10.0.2.2:8080/api/google?id_token=${googleSignInAuthentication.idToken}');
+
+    if (serverResponse.statusCode != 200) {
+      this.parent.logOut();
+
+      return;
+    }
+
+    final profile = jsonDecode(serverResponse.body);
+
+    setState(() {
+      userProfile = profile;
+    });
+
+    this.parent.logIn(LOGIN_TYPES.GOOGLE);
   }
 
-  _logout(){
-    facebookLogin.logOut();
-    this.parent.setState(() {
-      this.parent.isLoggedIn = false;
-    });
+  _logout() {
+    googleSignIn.signOut();
+
+    this.parent.logOut();
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: this.parent.isLoggedIn
-            ? Column(
-          children: <Widget>[
-            Image.network(userProfile["picture"]["data"]["url"], height: 50.0, width: 50.0,),
-            Text(userProfile["name"]),
-            OutlineButton( child: Text("Continue to app >>"), onPressed: (){
-              this.parent.setState(() {
-                this.parent.isLoggedIn = true;
-              });
-            }),
-            OutlineButton( child: Text("Logout"), onPressed: (){
-              _logout();
-            },)
-          ],
-        )
-            : Center(
-          child: OutlineButton(
-            child: FacebookSignInButton(
-              onPressed: () {
-                _loginWithFB();
-              },
+      child: this.parent.loginType == LOGIN_TYPES.GOOGLE
+          ? Column(
+              children: <Widget>[
+                Image.network(
+                  userProfile["picture"],
+                  height: 50.0,
+                  width: 50.0,
+                ),
+                Text(userProfile["name"]),
+                OutlineButton(
+                    child: Text("Continue to app >>"),
+                    onPressed: () {
+                      this.parent.goToApp();
+                    }),
+                OutlineButton(
+                  child: Text("Logout"),
+                  onPressed: () {
+                    _logout();
+                  },
+                )
+              ],
+            )
+          : Center(
+              child: this.parent.loginType != LOGIN_TYPES.NONE
+                  ? null
+                  : OutlineButton(
+                      child: GoogleSignInButton(
+                        onPressed: () {
+                          _loginWithGoogle();
+                        },
+                      ),
+                    ),
             ),
-          ),
-        ),
     );
   }
 }
