@@ -81,7 +81,7 @@ class MyAppState extends State<MyApp> {
             return FloatingActionButton(
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => AddFlyerForm())
+                  MaterialPageRoute(builder: (context) => AddFlyerForm(refreshCallback))
                 );
               },
               child: Icon(Icons.add_circle),
@@ -91,6 +91,12 @@ class MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+  
+  void refreshCallback() {
+    setState(() {
+      flyers = fetchFlyers();
+    });
   }
 }
 
@@ -109,7 +115,7 @@ class FlyersView extends StatelessWidget {
           child: Column(
             children: <Widget>[
               Expanded(
-                child: Image.network(flyers[index].imageKey)
+                child: Image.network("http://10.0.2.2:8080/api/file?key=${flyers[index].imageKey}")
               ),
               Expanded(
                 child: Text(flyers[index].title,
@@ -143,7 +149,7 @@ class FlyerView extends StatelessWidget {
             Text(flyer.title, style: Theme.of(context).textTheme.headline),
             Container(
               margin: const EdgeInsets.all(10.0),
-              child: Image.network(flyer.imageKey, height: 300.0)
+              child: Image.network("http://10.0.2.2:8080/api/file?key=${flyer.imageKey}", height: 300.0)
             ),
             Text(flyer.description, style: Theme.of(context).textTheme.body1),
           ]
@@ -154,6 +160,10 @@ class FlyerView extends StatelessWidget {
 }
 
 class AddFlyerForm extends StatefulWidget {
+  Function() refreshCallback;
+  
+  AddFlyerForm(this.refreshCallback);
+  
   @override
   AddFlyerFormState createState() {
     return AddFlyerFormState();
@@ -317,6 +327,7 @@ class AddFlyerFormState extends State<AddFlyerForm> {
       
       pr.hide().whenComplete(() {
         Navigator.of(context).pop();
+        widget.refreshCallback();
       });
     } catch (e) {
       await pr.hide();
