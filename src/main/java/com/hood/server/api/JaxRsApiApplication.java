@@ -1,7 +1,6 @@
 package com.hood.server.api;
 
 import com.hood.server.api.auth.AuthenticationFilter;
-import com.hood.server.api.report.Report;
 import com.hood.server.api.auth.LoginApi;
 import com.hood.server.api.flyers.FlyersApi;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -22,8 +21,6 @@ public class JaxRsApiApplication extends Application
 		c.add(LoginApi.class);
 		c.add(FileApi.class);
 		c.add(FlyersApi.class);
-		
-		c.add(Report.class);
 		
 		classes = Collections.unmodifiableSet(c);
 	}
