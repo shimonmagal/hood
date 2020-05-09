@@ -70,4 +70,9 @@ public class BlobInterface
 			return null;
 		}
 	}
+	
+	public File getFile(String key)
+	{
+		return new File(storageDirectory, key);
+	}
 }
