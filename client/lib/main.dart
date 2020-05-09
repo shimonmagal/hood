@@ -272,6 +272,30 @@ class AddFlyerFormState extends State<AddFlyerForm> {
     await pr.show();
     
     try {
+      var uri = Uri.parse('http://10.0.2.2:8080/api/file');
+      var request = http.MultipartRequest('PUT', uri)
+        ..files.add(await http.MultipartFile.fromPath('file', image.path));
+      
+      var uploadImageResponse = await request.send();
+      
+      if (uploadImageResponse.statusCode != 200) {
+        await pr.hide();
+        setState(() {
+          _errorStatus = "Error uploading image: ${uploadImageResponse.statusCode}";
+        });
+        return;
+      }
+      
+      final imageKey = await uploadImageResponse.stream.bytesToString();
+      
+      if (imageKey.isEmpty) {
+        await pr.hide();
+        setState(() {
+          _errorStatus = "Missing image key: ${uploadImageResponse.statusCode}";
+        });
+        return;
+      }
+      
       final response = await http.post('http://10.0.2.2:8080/api/flyers',
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -279,7 +303,7 @@ class AddFlyerFormState extends State<AddFlyerForm> {
         body: jsonEncode(<String, String>{
           'title': title,
           'description': description,
-          'imageUrl': 'TBD'
+          'imageUrl': imageKey
         }),
       );
       
