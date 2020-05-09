@@ -1,10 +1,10 @@
-import 'package:dude/auth/facebook.dart';
-import 'package:dude/auth/google.dart';
-import 'package:dude/main.dart';
+import 'package:hood/screens/login/facebook.dart';
+import 'package:hood/screens/login/google.dart';
+import 'package:hood/screens/main_screen.dart';
 import 'package:flutter/material.dart';
 
 class LoginView extends StatefulWidget {
-  final MyAppState parent;
+  final MainScreenState parent;
 
   LoginView(this.parent);
 
@@ -17,7 +17,7 @@ class LoginView extends StatefulWidget {
 enum LOGIN_TYPES { NONE, GOOGLE, FACEBOOK }
 
 class LoginViewState extends State<LoginView> {
-  final MyAppState parent;
+  final MainScreenState parent;
   LOGIN_TYPES loginType = LOGIN_TYPES.NONE;
 
   LoginViewState(this.parent);

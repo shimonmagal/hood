@@ -1,9 +1,9 @@
-import 'package:dude/auth/login.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'dart:convert';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
+import 'package:hood/screens/login_screen.dart';
 
 class GoogleLoginView extends StatefulWidget {
   final LoginViewState parent;
