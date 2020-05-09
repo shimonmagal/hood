@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "39117846579",
+    "firebase_url": "https://hood-35cb7.firebaseio.com",
+    "project_id": "hood-35cb7",
+    "storage_bucket": "hood-35cb7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:39117846579:android:8b1021172c89c4d1b8cb46",
+        "android_client_info": {
+          "package_name": "com.hood.hood"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "39117846579-90drj93efv2cd8vmvl30gc0f0gir3lgn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hood.hood",
+            "certificate_hash": "84a448dd32a7e97bdf254fe6c56e635e823ad9ca"
+          }
+        },
+        {
+          "client_id": "39117846579-13272mh9u2ld14da8vvib1v5rqlsei5i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1LNfPMixNGkg3WNYoqal_mPTsZmiJOoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "39117846579-13272mh9u2ld14da8vvib1v5rqlsei5i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
