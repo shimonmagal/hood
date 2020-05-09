@@ -1,8 +1,8 @@
 package com.hood.server.api;
 
 import com.hood.server.api.auth.AuthenticationFilter;
-import com.hood.server.api.auth.LoginApi;
-import com.hood.server.api.FlyersApi;
+import com.hood.server.api.auth.FacebookLoginApi;
+import com.hood.server.api.auth.GoogleLoginApi;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import javax.ws.rs.core.Application;
@@ -18,9 +18,10 @@ public class JaxRsApiApplication extends Application
 		
 		c.add(MultiPartFeature.class);
 		c.add(AuthenticationFilter.class);
-		c.add(LoginApi.class);
+		c.add(GoogleLoginApi.class);
 		c.add(BlobApi.class);
 		c.add(FlyersApi.class);
+		c.add(FacebookLoginApi.class);
 		
 		classes = Collections.unmodifiableSet(c);
 	}

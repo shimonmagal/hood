@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
+import 'auth/login.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -50,11 +52,13 @@ class MyApp extends StatefulWidget {
 
 class MyAppState extends State<MyApp> {
   Future<List<Flyer>> flyers;
+  bool loggedIn = false;
   
   @override
   void initState() {
     super.initState();
     flyers = fetchFlyers();
+    loggedIn = false;
   }
   
   @override
@@ -67,7 +71,11 @@ class MyAppState extends State<MyApp> {
         body: FutureBuilder(
           future: flyers,
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
+            if (this.loggedIn == false)
+            {
+                return LoginView(this);
+            }
+            else if (snapshot.hasData) {
               List<Flyer> flyers = snapshot.data;
               
               return FlyersView(flyers);
