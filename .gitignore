@@ -13,3 +13,4 @@ out/
 .idea/
 .idea_modules/
 **/node_modules/*
+.storage
