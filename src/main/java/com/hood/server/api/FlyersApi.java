@@ -28,6 +28,8 @@ public class FlyersApi
 	{
 		try
 		{
+			logger.info("Getting all flyers");
+			
 			List<Document> documents = DBInterface.get().getAllDocuments("flyers");
 			
 			if (documents == null)
@@ -62,7 +64,12 @@ public class FlyersApi
 			ObjectMapper jsonMapper = new ObjectMapper(); 
 			Flyer flyer = jsonMapper.readValue(flyerJson, Flyer.class); 
 			
-			System.out.println("Add flyer called " + flyer);
+			logger.info("Adding new flyer: {}", flyer);
+			
+			if (!DBInterface.get().addDocument("flyers", flyer.toBsonObject()))
+			{
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
 			
 			return Response
 				.status(Response.Status.OK)
