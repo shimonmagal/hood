@@ -12,12 +12,12 @@ void main() {
 class Flyer {
   final String title;
   final String description;
-  final String imageUrl;
+  final String imageKey;
   
-  Flyer(this.title, this.description, this.imageUrl);
+  Flyer(this.title, this.description, this.imageKey);
   
   factory Flyer.fromJson(Map json) {
-    return Flyer(json['title'], json['description'], json['imageUrl']);
+    return Flyer(json['title'], json['description'], json['imageKey']);
   }
 }
 
@@ -109,7 +109,7 @@ class FlyersView extends StatelessWidget {
           child: Column(
             children: <Widget>[
               Expanded(
-                child: Image.network(flyers[index].imageUrl)
+                child: Image.network(flyers[index].imageKey)
               ),
               Expanded(
                 child: Text(flyers[index].title,
@@ -143,7 +143,7 @@ class FlyerView extends StatelessWidget {
             Text(flyer.title, style: Theme.of(context).textTheme.headline),
             Container(
               margin: const EdgeInsets.all(10.0),
-              child: Image.network(flyer.imageUrl, height: 300.0)
+              child: Image.network(flyer.imageKey, height: 300.0)
             ),
             Text(flyer.description, style: Theme.of(context).textTheme.body1),
           ]
@@ -303,7 +303,7 @@ class AddFlyerFormState extends State<AddFlyerForm> {
         body: jsonEncode(<String, String>{
           'title': title,
           'description': description,
-          'imageUrl': imageKey
+          'imageKey': imageKey
         }),
       );
       

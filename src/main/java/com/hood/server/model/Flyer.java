@@ -11,14 +11,14 @@ public class Flyer
 	private final String id;
 	private final String title;
 	private final String description;
-	private final String imageUrl;
+	private final String imageKey;
 	
-	public Flyer(String id, String title, String description, String imageUrl)
+	public Flyer(String id, String title, String description, String imageKey)
 	{
 		this.id = id;
 		this.title = title;
 		this.description = description;
-		this.imageUrl = imageUrl;
+		this.imageKey = imageKey;
 	}
 	
 	public String getId()
@@ -36,16 +36,16 @@ public class Flyer
 		return description;
 	}
 	
-	public String getImageUrl()
+	public String getImageKey()
 	{
-		return imageUrl;
+		return imageKey;
 	}
 	
 	@Override
 	public String toString()
 	{
 		return String.format("(id: %s) (title: %s) (description: %s) (image: %s)", 
-			id, title, description, imageUrl);
+			id, title, description, imageKey);
 	}
 	
 	public Document toBsonObject()
@@ -67,9 +67,9 @@ public class Flyer
 			bson.append("description", description);
 		}
 		
-		if (imageUrl != null)
+		if (imageKey != null)
 		{
-			bson.append("imageUrl", imageUrl);
+			bson.append("imageKey", imageKey);
 		}
 		
 		return bson;
@@ -81,7 +81,7 @@ public class Flyer
 			.withId(bson.getObjectId("_id").toString())
 			.withTitle(bson.getString("title"))
 			.withDescription(bson.getString("description"))
-			.withImageUrl(bson.getString("imageUrl"))
+			.withImageKey(bson.getString("imageKey"))
 			.build();
 	}
 	
@@ -91,7 +91,7 @@ public class Flyer
 		private String id;
 		private String title;
 		private String description;
-		private String imageUrl;
+		private String imageKey;
 		
 		public Builder withId(String id)
 		{
@@ -111,15 +111,15 @@ public class Flyer
 			return this;
 		}
 		
-		public Builder withImageUrl(String imageUrl)
+		public Builder withImageKey(String imageKey)
 		{
-			this.imageUrl = imageUrl;
+			this.imageKey = imageKey;
 			return this;
 		}
 		
 		public Flyer build()
 		{
-			return new Flyer(id, title, description, imageUrl);
+			return new Flyer(id, title, description, imageKey);
 		}
 	}
 }
