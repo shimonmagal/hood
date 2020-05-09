@@ -17,9 +17,9 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import com.hood.server.services.BlobInterface;
 
 @Path("file")
-public class FileApi
+public class BlobApi
 {
-	private static final Logger logger = LoggerFactory.getLogger(FileApi.class);
+	private static final Logger logger = LoggerFactory.getLogger(BlobApi.class);
 	
 	@PUT
 	@Consumes(MediaType.MULTIPART_FORM_DATA)

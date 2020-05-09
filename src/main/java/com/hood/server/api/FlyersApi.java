@@ -1,4 +1,4 @@
-package com.hood.server.api.flyers;
+package com.hood.server.api;
 
 import java.util.List;
 import java.util.ArrayList;
