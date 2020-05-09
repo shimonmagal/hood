@@ -24,7 +24,7 @@ public class HoodServer
 	
 	public static void main(String[] args) throws Exception
 	{
-		if (DBInterface.get() == null)
+		if (!DBInterface.get().checkConnectivity())
 		{
 			return;
 		}

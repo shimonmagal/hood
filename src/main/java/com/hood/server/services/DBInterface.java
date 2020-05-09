@@ -74,6 +74,21 @@ public class DBInterface
 		return mongoClient.getDatabase("hood");
 	}
 	
+	public boolean checkConnectivity()
+	{
+		try
+		{
+			Document serverStatus = getHoodDatabase().runCommand(new Document("serverStatus", 1));
+			
+			return true;
+		}
+		catch (Exception e)
+		{
+			logger.error("Error getting server status from Mongo", e);
+			return false;
+		}
+	}
+	
 	public boolean addDocument(String collectionName, Document bsonObject)
 	{
 		try
