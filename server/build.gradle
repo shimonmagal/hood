@@ -46,7 +46,6 @@ task generateScripts(dependsOn:"jar") {
 		def scriptFile = new File("$binDir/${projectDir.name}.$ext")
 		def classPath = configurations.runtime.resolve()
 		classPath += jar.archivePath
-		classPath += sourceSets.main.output.resourcesDir
 		def classPathStr = classPath.join(File.pathSeparator)
 
 		print osName
