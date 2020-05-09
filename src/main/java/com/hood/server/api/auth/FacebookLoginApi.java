@@ -1,65 +1,93 @@
 package com.hood.server.api.auth;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.hood.server.session.SessionManager;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hood.server.services.DBInterface;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Collections;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
-@Path("login")
-public class LoginApi
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+@Path("facebook")
+public class FacebookLoginApi
 {
-	private static final String CLIENT_ID = "302172748643-4ku8jk6v9le1agq7qtj82qn4ombphkld.apps.googleusercontent.com";
+	private final Logger logger = LoggerFactory.getLogger(FacebookLoginApi.class);
 	
-	private static final Logger logger = LoggerFactory.getLogger(LoginApi.class);
-	
-	@POST
-	@Consumes("text/plain")
-	public Response authenticate(String idTokenString, @HeaderParam("Referer") String referer)
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response authenticate(@QueryParam("access_token") String accessToken)
 	{
-		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
-				.setAudience(Collections.singletonList(CLIENT_ID))
-				.build();
-		
 		try
 		{
-			GoogleIdToken idToken = verifier.verify(idTokenString);
-			if (idToken != null)
+			URL facebookGraphUrl = new URL("https://graph.facebook.com/v2.12/me?fields=name,picture,email&access_token=" + accessToken);
+			HttpURLConnection conn = (HttpURLConnection) facebookGraphUrl.openConnection();
+			conn.setDoOutput(true);
+			
+			conn.connect();
+			
+			int code = conn.getResponseCode();
+			
+			if (code != HttpURLConnection.HTTP_OK)
 			{
-				GoogleIdToken.Payload payload = idToken.getPayload();
+				logger.error("Facebook graph api returned code {} for accessToken: {}", code, accessToken);
 				
-				// Print user identifier
-				String userId = payload.getSubject();
+				return Response.status(Response.Status.FORBIDDEN).build();
+			}
+			
+			StringBuilder json = new StringBuilder();
+			
+			try (InputStream is = conn.getInputStream();
+			     InputStreamReader isr = new InputStreamReader(is);
+			     BufferedReader br = new BufferedReader(isr))
+			{
+				String line;
 				
-				logger.debug("User ID: {}", payload.getEmail());
-				
-				if (payload.getEmail().endsWith("@gmail.com"))
-				{
-					String session = SessionManager.createSession(payload.getEmail());
-					
-					boolean secure = referer.toLowerCase().startsWith("https");
-					NewCookie cookie = new NewCookie("JSESSIONID", session, "/", null, null, 2 * 60 * 60, secure, true);
-					return Response.ok().entity(payload.getEmail()).cookie(cookie).build();
+				while ((line = br.readLine()) != null) {
+					json.append(line+"\n");
 				}
 			}
+			
+			final ObjectNode node = new ObjectMapper().readValue(json.toString(), ObjectNode.class);
+			
+			if (!node.has("email"))
+			{
+				logger.error("No email field in response from facebook login. Full json: {}", json);
+				
+				System.out.println("contentType: " + node.get("contentType"));
+			}
+			
+			String email = node.get("email").asText();
+			Map<String, Object> userMap = new HashMap<>();
+			userMap.put("email", email);
+			
+			if (!DBInterface.get().addDocument("users", new Document(userMap)))
+			{
+				logger.error("Adding user with email: {} retrieved from facebook failed", email);
+				return Response.serverError().entity("Error occurred in server").build();
+			}
+			
+			return Response.ok().
+					entity(json.toString()).
+					build();
 		}
 		catch (Exception e)
 		{
+			logger.error("Facebook login failed", e);
 			e.printStackTrace();
 			
 			return Response.serverError().entity("Error occurred in server").build();
 		}
-		
-		return Response.status(403).entity("User not permitted").build();
 	}
 }

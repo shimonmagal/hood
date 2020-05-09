@@ -1,31 +1,35 @@
 package com.hood.server.api.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.hood.server.services.DBInterface;
 import com.hood.server.session.SessionManager;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-@Path("login")
-public class LoginApi
+@Path("google")
+public class GoogleLoginApi
 {
-	private static final String CLIENT_ID = "302172748643-4ku8jk6v9le1agq7qtj82qn4ombphkld.apps.googleusercontent.com";
+	private static final String CLIENT_ID = "39117846579-13272mh9u2ld14da8vvib1v5rqlsei5i.apps.googleusercontent.com";
 	
-	private static final Logger logger = LoggerFactory.getLogger(LoginApi.class);
+	private static final Logger logger = LoggerFactory.getLogger(GoogleLoginApi.class);
 	
-	@POST
-	@Consumes("text/plain")
-	public Response authenticate(String idTokenString, @HeaderParam("Referer") String referer)
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response authenticate(@QueryParam("id_token") String idTokenString)
 	{
 		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
 				.setAudience(Collections.singletonList(CLIENT_ID))
@@ -34,6 +38,7 @@ public class LoginApi
 		try
 		{
 			GoogleIdToken idToken = verifier.verify(idTokenString);
+			
 			if (idToken != null)
 			{
 				GoogleIdToken.Payload payload = idToken.getPayload();
@@ -43,14 +48,16 @@ public class LoginApi
 				
 				logger.debug("User ID: {}", payload.getEmail());
 				
-				if (payload.getEmail().endsWith("@gmail.com"))
+				Map<String, Object> userMap = new HashMap<>();
+				userMap.put("email", payload.getEmail());
+				
+				if (!DBInterface.get().addDocument("users", new Document(userMap)))
 				{
-					String session = SessionManager.createSession(payload.getEmail());
-					
-					boolean secure = referer.toLowerCase().startsWith("https");
-					NewCookie cookie = new NewCookie("JSESSIONID", session, "/", null, null, 2 * 60 * 60, secure, true);
-					return Response.ok().entity(payload.getEmail()).cookie(cookie).build();
+					logger.error("Adding user with email: {} retrieved from facebook failed", payload.getEmail());
+					return Response.serverError().entity("Error occurred in server").build();
 				}
+				
+				return Response.ok().entity(payload.toString()).build();
 			}
 		}
 		catch (Exception e)
