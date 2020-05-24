@@ -51,6 +51,11 @@ public class BlobInterface
 		this.storageDirectory = storageDirectory;
 	}
 	
+	public boolean initialize()
+	{
+		return true;
+	}
+	
 	public String putNew(InputStream inputStream)
 	{
 		String newObjectKey = UUID.randomUUID().toString();

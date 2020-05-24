@@ -37,7 +37,7 @@ public class BlobApi
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			}
 			
-			logger.info("File uploaded: {}", fileKey);
+			logger.info("Blob uploaded: {}", fileKey);
 			
 			return Response
 				.status(Response.Status.OK)
@@ -46,7 +46,7 @@ public class BlobApi
 		}
 		catch (Exception e)
 		{
-			logger.error("Error uploading file", e);
+			logger.error("Error uploading Blob", e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
@@ -54,7 +54,18 @@ public class BlobApi
 	@GET
 	public Response get(@QueryParam("key") String key)
 	{
-		File file = BlobInterface.get().getFile(key);
-		return Response.ok(file).build();
+		try
+		{
+			File file = BlobInterface.get().getFile(key);
+			
+			logger.info("Getting blob: {} {}", key, file);
+			
+			return Response.ok(file).build();
+		}
+		catch (Exception e)
+		{
+			logger.error("Error getting Blob", key, e);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 }

@@ -8,17 +8,21 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 @JsonDeserialize(builder = Flyer.Builder.class)
 public class Flyer
 {
+	public static final String ENTITY_PLURAL_NAME = "flyers";
+	
 	private final String id;
 	private final String title;
 	private final String description;
 	private final String imageKey;
+	private final Position location;
 	
-	public Flyer(String id, String title, String description, String imageKey)
+	public Flyer(String id, String title, String description, String imageKey, Position location)
 	{
 		this.id = id;
 		this.title = title;
 		this.description = description;
 		this.imageKey = imageKey;
+		this.location = location;
 	}
 	
 	public String getId()
@@ -44,8 +48,8 @@ public class Flyer
 	@Override
 	public String toString()
 	{
-		return String.format("(id: %s) (title: %s) (description: %s) (image: %s)", 
-			id, title, description, imageKey);
+		return String.format("(id: %s) (title: %s) (description: %s) (image: %s) (loc: %s)", 
+			id, title, description, imageKey, location);
 	}
 	
 	public Document toBsonObject()
@@ -72,6 +76,11 @@ public class Flyer
 			bson.append("imageKey", imageKey);
 		}
 		
+		if (location != null)
+		{
+			bson.append("location", location.toBsonObject());
+		}
+		
 		return bson;
 	}
 	
@@ -92,6 +101,7 @@ public class Flyer
 		private String title;
 		private String description;
 		private String imageKey;
+		private Position location;
 		
 		public Builder withId(String id)
 		{
@@ -117,9 +127,15 @@ public class Flyer
 			return this;
 		}
 		
+		public Builder withLocation(Position location)
+		{
+			this.location = location;
+			return this;
+		}
+		
 		public Flyer build()
 		{
-			return new Flyer(id, title, description, imageKey);
+			return new Flyer(id, title, description, imageKey, location);
 		}
 	}
 }

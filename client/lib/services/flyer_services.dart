@@ -23,7 +23,8 @@ class FlyerServices {
     }
   }
   
-  static Future<SendFlyerResponse> sendFlyer(String title, String description, File image) async {
+  static Future<SendFlyerResponse> sendFlyer(
+      String title, String description, File image, double latitude, double longitude) async {
     try {
       var uri = Uri.parse('http://10.0.2.2:8080/api/file');
       var request = http.MultipartRequest('PUT', uri)
@@ -45,10 +46,14 @@ class FlyerServices {
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: jsonEncode(<String, String>{
+        body: jsonEncode(<String, dynamic>{
           'title': title,
           'description': description,
-          'imageKey': imageKey
+          'imageKey': imageKey,
+          'location': {
+            'latitude':  latitude,
+            'longitude': longitude
+          }
         }),
       );
       

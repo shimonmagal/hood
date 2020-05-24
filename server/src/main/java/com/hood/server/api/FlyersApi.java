@@ -30,7 +30,7 @@ public class FlyersApi
 		{
 			logger.info("Getting all flyers");
 			
-			List<Document> documents = DBInterface.get().getAllDocuments("flyers");
+			List<Document> documents = DBInterface.get().getAllDocuments(Flyer.ENTITY_PLURAL_NAME);
 			
 			if (documents == null)
 			{
@@ -66,7 +66,7 @@ public class FlyersApi
 			
 			logger.info("Adding new flyer: {}", flyer);
 			
-			if (!DBInterface.get().addDocument("flyers", flyer.toBsonObject()))
+			if (!DBInterface.get().addDocument(Flyer.ENTITY_PLURAL_NAME, flyer.toBsonObject()))
 			{
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 			}

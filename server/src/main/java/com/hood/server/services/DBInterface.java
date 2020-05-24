@@ -12,8 +12,11 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Indexes;	
 
 import org.bson.Document;
+
+import com.hood.server.model.Flyer;
 
 public class DBInterface
 {
@@ -74,10 +77,27 @@ public class DBInterface
 		return mongoClient.getDatabase("hood");
 	}
 	
+	public boolean initialize()
+	{
+		if (!checkConnectivity())
+		{
+			return false;
+		}
+		
+		if (!buildIndexes())
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
 	public boolean checkConnectivity()
 	{
 		try
 		{
+			logger.info("Checking DB connectivity");
+			
 			Document serverStatus = getHoodDatabase().runCommand(new Document("serverStatus", 1));
 			
 			return true;
@@ -85,6 +105,25 @@ public class DBInterface
 		catch (Exception e)
 		{
 			logger.error("Error getting server status from Mongo", e);
+			return false;
+		}
+	}
+	
+	private boolean buildIndexes()
+	{
+		try
+		{
+			logger.info("Building DB Indexes");
+			
+			MongoCollection<Document> flyers = getHoodDatabase().getCollection(Flyer.ENTITY_PLURAL_NAME);
+			
+			flyers.createIndex(Indexes.geo2dsphere("location"));
+			
+			return true;
+		}
+		catch (Exception e)
+		{
+			logger.error("Error building indexes", e);
 			return false;
 		}
 	}

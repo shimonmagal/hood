@@ -22,14 +22,24 @@ public class HoodServer
 	
 	private static final Logger logger = LoggerFactory.getLogger(HoodServer.class);
 	
-	public static void main(String[] args) throws Exception
+	private static boolean initializeServices()
 	{
-		if (!DBInterface.get().checkConnectivity())
+		if (!DBInterface.get().initialize())
 		{
-			return;
+			return false;
 		}
 		
-		if (BlobInterface.get() == null)
+		if (!BlobInterface.get().initialize())
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public static void main(String[] args) throws Exception
+	{
+		if (!initializeServices())
 		{
 			return;
 		}

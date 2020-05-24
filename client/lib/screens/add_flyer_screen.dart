@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:hood/services/flyer_services.dart';
+import 'package:geolocator/geolocator.dart';
 
 class AddFlyerForm extends StatefulWidget {
   Function() refreshCallback;
@@ -126,7 +127,10 @@ class AddFlyerFormState extends State<AddFlyerForm> {
   void sendFlyer(String title, String description, File image) async {
     await pr.show();
     
-    SendFlyerResponse result = await FlyerServices.sendFlyer(title, description, image);
+    Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    
+    SendFlyerResponse result = await FlyerServices.sendFlyer(
+        title, description, image, position.latitude, position.longitude);
     
     if (!result.success) {
       await pr.hide();
