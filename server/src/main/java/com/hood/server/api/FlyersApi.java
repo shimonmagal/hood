@@ -39,6 +39,7 @@ public class FlyersApi
 			
 			List<Flyer> flyers = documents.stream()
 				.map(doc -> Flyer.fromBsonObject(doc))
+				.filter(flyer -> flyer != null)
 				.collect(Collectors.toList());
 			
 			ObjectMapper jsonMapper = new ObjectMapper(); 

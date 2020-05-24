@@ -19,6 +19,8 @@ class FlyerViewer extends StatelessWidget {
               child: Image.network(BlobServices.getBlobUrl(flyer.imageKey), height: 300.0)
             ),
             Text(flyer.description, style: Theme.of(context).textTheme.body1),
+            Text(flyer.location.longitude.toString(), style: Theme.of(context).textTheme.body1),
+            Text(flyer.location.latitude.toString(), style: Theme.of(context).textTheme.body1),
           ]
         )
       ),

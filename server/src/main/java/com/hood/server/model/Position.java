@@ -1,5 +1,6 @@
 package com.hood.server.model;
 
+import java.util.List;
 import java.util.Arrays;
 
 import org.bson.Document;
@@ -46,6 +47,16 @@ public class Position
 		bson.append("coordinates", new BsonArray(Arrays.asList(new BsonDouble(longitude), new BsonDouble(latitude))));
 		
 		return bson;
+	}
+	
+	public static Position fromBsonObject(Document bson)
+	{
+		List<Double> coordinatesArray = (List<Double>) bson.get("coordinates");
+		
+		return new Builder()
+			.withLongitude(coordinatesArray.get(0))
+			.withLatitude(coordinatesArray.get(1))
+			.build();
 	}
 	
 	@JsonPOJOBuilder

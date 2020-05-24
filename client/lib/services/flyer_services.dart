@@ -51,7 +51,7 @@ class FlyerServices {
           'description': description,
           'imageKey': imageKey,
           'location': {
-            'latitude':  latitude,
+            'latitude': latitude,
             'longitude': longitude
           }
         }),

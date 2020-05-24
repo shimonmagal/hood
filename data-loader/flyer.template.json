@@ -1,0 +1,9 @@
+{
+	"title": "@title@",
+	"description": "@description@",
+	"imageKey": "@imageKey@",
+	"location": {
+		"latitude": @latitude@,
+		"longitude": @longitude@
+	}
+}
