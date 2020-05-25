@@ -4,6 +4,8 @@ import 'package:hood/services/flyer_services.dart';
 import 'package:hood/screens/login_screen.dart';
 import 'package:hood/screens/add_flyer_screen.dart';
 import 'package:hood/components/flyers_grid.dart';
+import 'package:hood/model/position.dart';
+import 'package:geolocator/geolocator.dart' as Geolocator;
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key}) : super(key: key);
@@ -14,11 +16,13 @@ class MainScreen extends StatefulWidget {
 
 class MainScreenState extends State<MainScreen> {
   Future<List<Flyer>> flyers;
+  Future<Position> positionFuture;
+  Position position;
   
   @override
   void initState() {
     super.initState();
-    flyers = FlyerServices.fetchFlyers();
+    positionFuture = getCurrentLocation(); 
   }
   
   @override
@@ -28,12 +32,13 @@ class MainScreenState extends State<MainScreen> {
           title: Text("Board"),
         ),
         body: FutureBuilder(
-          future: flyers,
+          future: Future.wait([flyers, positionFuture]),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              List<Flyer> flyers = snapshot.data;
+              List<Flyer> flyers = snapshot.data[0];
+              position = snapshot.data[1];
               
-              return FlyersGrid(flyers);
+              return FlyersGrid(flyers, position);
             }
             
             return CircularProgressIndicator();
@@ -57,7 +62,19 @@ class MainScreenState extends State<MainScreen> {
   
   void refreshCallback() {
     setState(() {
-      flyers = FlyerServices.fetchFlyers();
+      flyers = FlyerServices.fetchFlyers(position);
+    });
+  }
+  
+  Future<Position> getCurrentLocation() async {
+    return Geolocator.Geolocator().getCurrentPosition(desiredAccuracy: Geolocator.LocationAccuracy.high).then((value) {
+      Position position = new Position(value.longitude, value.latitude);
+      
+      setState(() {
+        flyers = FlyerServices.fetchFlyers(position);
+      });
+      
+      return position;
     });
   }
 }

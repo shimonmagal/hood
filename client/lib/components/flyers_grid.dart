@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:hood/model/flyer.dart';
 import 'package:hood/screens/flyer_viewer_screen.dart';
 import 'package:hood/services/blob_services.dart';
+import 'package:hood/model/position.dart';
 
 class FlyersGrid extends StatelessWidget {
   final List<Flyer> flyers;
+  final Position location;
   
-  FlyersGrid(this.flyers);
+  FlyersGrid(this.flyers, this.location);
   
   Widget build(BuildContext context) {
     return GridView.count(
@@ -56,7 +58,7 @@ class FlyersGrid extends StatelessWidget {
   }
   
   Future<String> getDistance(Flyer flyer) async {
-    return flyer.getDistanceInMetters(32.084120, 34.773172).then((distanceInMetters) {
+    return flyer.getDistanceInMetters(location.longitude, location.latitude).then((distanceInMetters) {
       if (distanceInMetters < 1000) {
         int roundedMetters = (50 * (distanceInMetters.round() / 50).round());
         return "$roundedMetters meters";

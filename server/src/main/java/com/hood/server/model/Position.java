@@ -54,8 +54,8 @@ public class Position
 		List<Double> coordinatesArray = (List<Double>) bson.get("coordinates");
 		
 		return new Builder()
-			.withLongitude(coordinatesArray.get(0))
-			.withLatitude(coordinatesArray.get(1))
+			.withLongitude(coordinatesArray.get(1))
+			.withLatitude(coordinatesArray.get(0))
 			.build();
 	}
 	

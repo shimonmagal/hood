@@ -2,9 +2,10 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:hood/model/flyer.dart';
+import 'package:hood/model/position.dart';
 
 class FlyerServices {
-  static Future<List<Flyer>> fetchFlyers() async {
+  static Future<List<Flyer>> fetchFlyers(Position position) async {
     final response = await http.get('http://10.0.2.2:8080/api/flyers');
     
     if (response.statusCode == 200) {

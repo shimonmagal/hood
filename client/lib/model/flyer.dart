@@ -14,10 +14,10 @@ class Flyer {
   }
   
   Future<List<Geolocator.Placemark>> getLocationAddress() {
-  	return Geolocator.Geolocator().placemarkFromCoordinates(location.longitude, location.latitude);
+  	return Geolocator.Geolocator().placemarkFromCoordinates(location.latitude, location.longitude);
   }
   
   Future<double> getDistanceInMetters(double longitude, double latitude) {
-  	return Geolocator.Geolocator().distanceBetween(longitude, latitude, location.longitude, location.latitude);
+  	return Geolocator.Geolocator().distanceBetween(latitude, longitude, location.latitude, location.longitude);
   }
 }
