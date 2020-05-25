@@ -58,13 +58,13 @@ class FlyersGrid extends StatelessWidget {
   }
   
   Future<String> getDistance(Flyer flyer) async {
-    return flyer.getDistanceInMetters(location.longitude, location.latitude).then((distanceInMetters) {
+    return flyer.getDistanceInMetters(location.longitude, location.latitude).then((double distanceInMetters) {
       if (distanceInMetters < 1000) {
-        int roundedMetters = (50 * (distanceInMetters.round() / 50).round());
+        int roundedMetters = (50 * (distanceInMetters.ceil() / 50).ceil());
         return "$roundedMetters meters";
       } else {
-        int kilometers = (distanceInMetters / 1000).floor();
-        int roundedMetters = (distanceInMetters % 1000 / 100).round();
+        int kilometers = (distanceInMetters / 1000).ceil();
+        int roundedMetters = (distanceInMetters % 1000 / 100).ceil();
         
         return "${kilometers}.${roundedMetters} kilometers";
       }
