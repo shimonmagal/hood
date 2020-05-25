@@ -1,18 +1,18 @@
 package com.hood.server;
 
-import com.hood.server.api.JaxRsApiApplication;
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.ext.RuntimeDelegate;
-import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.URI;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
+import com.hood.server.api.JaxRsApiApplication;
 import com.hood.server.services.DBInterface;
 import com.hood.server.services.BlobInterface;
 
@@ -58,7 +58,9 @@ public class HoodServer
 		HttpHandler apiHandler = RuntimeDelegate.getInstance().createEndpoint(new JaxRsApiApplication(), HttpHandler.class);
 		server.createContext("/api", apiHandler);
 		
-		server.setExecutor(null);
+		ExecutorService clientsThreadPool = Executors.newFixedThreadPool(100);
+		server.setExecutor(Executors.newFixedThreadPool(100));
+
 		server.start();
 	}
 }
