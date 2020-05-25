@@ -14,6 +14,7 @@ public class Flyer
 	private static final Logger logger = LoggerFactory.getLogger(Flyer.class);
 	
 	public static final String ENTITY_PLURAL_NAME = "flyers";
+	public static final String LOCATION_FIELD_NAME = "location";
 	
 	private final String id;
 	private final String title;
@@ -88,7 +89,7 @@ public class Flyer
 		
 		if (location != null)
 		{
-			bson.append("location", location.toBsonObject());
+			bson.append(LOCATION_FIELD_NAME, location.toBsonObject());
 		}
 		
 		return bson;
@@ -96,7 +97,7 @@ public class Flyer
 	
 	public static Flyer fromBsonObject(Document bson)
 	{
-		Object locationDoc = bson.get("location");
+		Object locationDoc = bson.get(LOCATION_FIELD_NAME);
 		
 		if (!(locationDoc instanceof Document))
 		{

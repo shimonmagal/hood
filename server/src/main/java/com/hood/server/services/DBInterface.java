@@ -12,9 +12,13 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.Indexes;	
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.geojson.Point;
+import com.mongodb.client.model.geojson.Position;
 
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import com.hood.server.model.Flyer;
 
@@ -151,6 +155,39 @@ public class DBInterface
 		{
 			MongoCollection<Document> collection = getHoodDatabase().getCollection(collectionName);
 			MongoCursor<Document> cursor = collection.find().iterator();
+			List<Document> result = new ArrayList();
+			
+			try
+			{
+				while (cursor.hasNext())
+				{
+					result.add(cursor.next());
+				}
+			}
+			finally
+			{
+				cursor.close();
+			}
+			
+			return result;
+		}
+		catch (Exception e)
+		{
+			logger.error("Error getting Documents", e);
+			return null;
+		}
+	}
+	
+	public List<Document> getNearestDocuments(String collectionName, String locationFieldName,
+		double longitude, double latitude, double maxDistanceInMetters, double minDistanceInMetters)
+	{
+		try
+		{
+			Point position = new Point(new Position(latitude, longitude));
+			Bson nearFilter = Filters.near(locationFieldName, position, maxDistanceInMetters, minDistanceInMetters);
+			
+			MongoCollection<Document> collection = getHoodDatabase().getCollection(collectionName);
+			MongoCursor<Document> cursor = collection.find(nearFilter).iterator();
 			List<Document> result = new ArrayList();
 			
 			try

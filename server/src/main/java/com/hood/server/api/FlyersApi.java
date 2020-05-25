@@ -12,6 +12,7 @@ import org.bson.Document;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.databind.ObjectMapper; 
 
@@ -24,13 +25,18 @@ public class FlyersApi
 	private static final Logger logger = LoggerFactory.getLogger(FlyersApi.class);
 	
 	@GET
-	public Response getFlyters()
+	public Response getFlyters(
+		@QueryParam("longitude") double longitude, 
+		@QueryParam("latitude") double latitude,
+		@QueryParam("maxDistanceInMetters") double maxDistanceInMetters)
 	{
 		try
 		{
-			logger.info("Getting all flyers");
+			logger.info("Getting all flyers for (long: {}) (lat: {}) (distance: {})", 
+					longitude, latitude, maxDistanceInMetters);
 			
-			List<Document> documents = DBInterface.get().getAllDocuments(Flyer.ENTITY_PLURAL_NAME);
+			List<Document> documents = DBInterface.get().getNearestDocuments(
+					Flyer.ENTITY_PLURAL_NAME, Flyer.LOCATION_FIELD_NAME, longitude, latitude, maxDistanceInMetters, 0);
 			
 			if (documents == null)
 			{
