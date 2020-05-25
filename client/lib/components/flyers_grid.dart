@@ -21,19 +21,51 @@ class FlyersGrid extends StatelessWidget {
                 child: Image.network(BlobServices.getBlobUrl(flyers[index].imageKey))
               ),
               Expanded(
-                child: Text(flyers[index].title,
-                  style: Theme.of(context).textTheme.caption,
-                ),
+                child: Column(
+                  children: <Widget>[
+                    Text(flyers[index].title,
+                      style: TextStyle(fontSize: 15)
+                    ),
+                    FutureBuilder(
+                      future: getDistance(flyers[index]),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          String formattedDistance = snapshot.data;
+                          
+                          return Text("$formattedDistance away",
+                            style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Colors.black.withOpacity(0.6))
+                          );
+                        }
+                        
+                        return Text("");
+                      }
+                    ),
+                  ]
+                )
               ),
             ],
           ),
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => FlyerViewer(flyers[index]))
+              MaterialPageRoute(builder: (context) => FlyerViewerForm(flyers[index]))
             );
           }
         );
       }
     ));
+  }
+  
+  Future<String> getDistance(Flyer flyer) async {
+    return flyer.getDistanceInMetters(32.084120, 34.773172).then((distanceInMetters) {
+      if (distanceInMetters < 1000) {
+        int roundedMetters = (50 * (distanceInMetters.round() / 50).round());
+        return "$roundedMetters meters";
+      } else {
+        int kilometers = (distanceInMetters / 1000).floor();
+        int roundedMetters = (distanceInMetters % 1000 / 100).round();
+        
+        return "${kilometers}.${roundedMetters} kilometers";
+      }
+    });
   }
 }
