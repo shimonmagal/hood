@@ -38,7 +38,7 @@ public class FlyersApi
 					longitude, latitude, maxDistanceInMetters);
 			
 			List<Document> documents = DBInterface.get().getNearestDocuments(
-					Flyer.ENTITY_PLURAL_NAME, Flyer.LOCATION_FIELD_NAME, longitude, latitude, maxDistanceInMetters * 1000000000, 0);
+					Flyer.ENTITY_PLURAL_NAME, Flyer.LOCATION_FIELD_NAME, longitude, latitude, maxDistanceInMetters, 0);
 			
 			if (documents == null)
 			{
