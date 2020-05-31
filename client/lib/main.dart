@@ -7,7 +7,7 @@ import 'package:hood/screens/flyer_viewer_screen.dart';
 
 void main() {
   runApp(MaterialApp(
-    initialRoute: '/',
+    initialRoute: '/login',
     routes: {
         '/': (context) => MainScreen(),
         '/login': (context) => LoginView()

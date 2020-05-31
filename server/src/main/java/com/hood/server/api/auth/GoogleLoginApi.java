@@ -6,6 +6,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.hood.server.model.User;
 import com.hood.server.services.DBInterface;
 import com.hood.server.session.SessionManager;
 import org.bson.Document;
@@ -46,18 +47,23 @@ public class GoogleLoginApi
 				// Print user identifier
 				String userId = payload.getSubject();
 				
-				logger.debug("User ID: {}", payload.getEmail());
+				String email = payload.getEmail();
+				logger.debug("User ID: {}", email);
 				
-				Map<String, Object> userMap = new HashMap<>();
-				userMap.put("email", payload.getEmail());
+				User user = new User(email, payload.get("picture").toString());
 				
-				if (!DBInterface.get().addDocument("users", new Document(userMap)))
+				if (!DBInterface.get().addDocument("users", user.toBsonObject()))
 				{
-					logger.error("Adding user with email: {} retrieved from facebook failed", payload.getEmail());
+					logger.error("Adding user with email: {} retrieved from google failed", email);
 					return Response.serverError().entity("Error occurred in server").build();
 				}
 				
-				return Response.ok().entity(payload.toString()).build();
+				String session = SessionManager.createSession(email);
+				
+				return Response.ok().
+						header("session", session).
+						entity(payload.toString()).
+						build();
 			}
 		}
 		catch (Exception e)

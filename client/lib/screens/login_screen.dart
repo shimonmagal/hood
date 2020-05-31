@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:hood/screens/login/facebook.dart';
 import 'package:hood/screens/login/google.dart';
-import 'package:hood/screens/main_screen.dart';
 import 'package:flutter/material.dart';
+import 'login/session.dart';
+import 'package:http/http.dart' as http;
 
 class LoginView extends StatefulWidget {
   @override
@@ -10,10 +13,22 @@ class LoginView extends StatefulWidget {
   }
 }
 
-enum LOGIN_TYPES { NONE, GOOGLE, FACEBOOK }
-
 class LoginViewState extends State<LoginView> {
   LOGIN_TYPES loginType = LOGIN_TYPES.NONE;
+  FacebookLoginView facebookProvider;
+  GoogleLoginView googleProvider;
+
+  @override
+  void initState() {
+    super.initState();
+
+    this.facebookProvider =
+    new FacebookLoginView(this.loginType, this.logIn, this.logOut);
+    this.googleProvider =
+    new GoogleLoginView(this.loginType, this.logIn, this.logOut);
+
+    useSessionIfPossible();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,23 +36,79 @@ class LoginViewState extends State<LoginView> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[FacebookLoginView(this), GoogleLoginView(this)],
+          children: <Widget>[
+            this.facebookProvider,
+            this.googleProvider
+          ],
         ),
       ),
     );
   }
 
-  logIn(LOGIN_TYPES loginType) {
+  logIn(LOGIN_TYPES loginType, String session, Map<String, Object> user) async {
     this.setState(() {
       this.loginType = loginType;
     });
+
+    if (await SessionHelper.internal().saveSession(
+        new Session(session, loginType))) {
+      goToApp(context, user, loginType);
+    }
   }
 
-  goToApp(context) {
-    Navigator.pushNamed(context, '/');
+  goToApp(context, userData, loginType) {
+    var provider;
+
+    switch (loginType) {
+      case LOGIN_TYPES.NONE:
+        return;
+      case LOGIN_TYPES.FACEBOOK:
+        provider = this.facebookProvider;
+        break;
+      case LOGIN_TYPES.GOOGLE:
+        provider = this.googleProvider;
+        break;
+    }
+
+    Navigator.pushNamed(
+        context, '/', arguments: {"userData": userData, "provider": provider});
   }
 
-  logOut(context) {
-    Navigator.pushNamed(context, '/login');
+  logOut(context) async {
+    var response = await http.delete('http://10.0.2.2:8080/api/session',
+        headers: await SessionHelper.internal().authHeaders());
+
+    if (response.statusCode != 200)
+    {
+      return;
+    }
+
+    bool result = await SessionHelper.internal().removeSession();
+
+    if (result) {
+      Navigator.pushNamed(context, '/login');
+    }
+  }
+
+  void useSessionIfPossible() async {
+    var session = await SessionHelper.internal().getSession();
+
+    if (session == null) {
+      return;
+    }
+
+    var response = await http.get('http://10.0.2.2:8080/api/session',
+        headers: {"session": session.session});
+
+    if (response.statusCode == 200) {
+      logIn(session.loginType, session.session, json.decode(response.body));
+    }
   }
 }
+
+abstract class LoginProvider
+{
+  logout(BuildContext context);
+}
+
+enum LOGIN_TYPES { NONE, GOOGLE, FACEBOOK }

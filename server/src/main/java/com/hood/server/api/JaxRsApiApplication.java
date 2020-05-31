@@ -1,6 +1,7 @@
 package com.hood.server.api;
 
 import com.hood.server.api.auth.AuthenticationFilter;
+import com.hood.server.api.auth.SessionApi;
 import com.hood.server.api.auth.FacebookLoginApi;
 import com.hood.server.api.auth.GoogleLoginApi;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -17,11 +18,16 @@ public class JaxRsApiApplication extends Application
 		Set<Class<?>> c = new HashSet<Class<?>>();
 		
 		c.add(MultiPartFeature.class);
+
+		// auth
+		c.add(SessionApi.class);
 		c.add(AuthenticationFilter.class);
 		c.add(GoogleLoginApi.class);
+		c.add(FacebookLoginApi.class);
+
+		// app
 		c.add(BlobApi.class);
 		c.add(FlyersApi.class);
-		c.add(FacebookLoginApi.class);
 		
 		classes = Collections.unmodifiableSet(c);
 	}

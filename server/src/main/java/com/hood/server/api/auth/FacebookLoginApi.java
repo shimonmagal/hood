@@ -2,7 +2,9 @@ package com.hood.server.api.auth;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.hood.server.model.User;
 import com.hood.server.services.DBInterface;
+import com.hood.server.session.SessionManager;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,16 +71,19 @@ public class FacebookLoginApi
 			}
 			
 			String email = node.get("email").asText();
-			Map<String, Object> userMap = new HashMap<>();
-			userMap.put("email", email);
-			
-			if (!DBInterface.get().addDocument("users", new Document(userMap)))
+
+			User user = new User(email, node.findValue("picture").get("data").get("url").asText());
+
+			if (!DBInterface.get().addDocument("users", user.toBsonObject()))
 			{
 				logger.error("Adding user with email: {} retrieved from facebook failed", email);
 				return Response.serverError().entity("Error occurred in server").build();
 			}
 			
+			String session = SessionManager.createSession(email);
+			
 			return Response.ok().
+					header("session", session).
 					entity(json.toString()).
 					build();
 		}

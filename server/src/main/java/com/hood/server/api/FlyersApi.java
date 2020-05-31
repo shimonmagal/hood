@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import com.hood.server.api.auth.Secured;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hood.server.services.DBInterface;
 import com.hood.server.model.Flyer;
 
+@Secured
 @Path("flyers")
 public class FlyersApi
 {
@@ -36,7 +38,7 @@ public class FlyersApi
 					longitude, latitude, maxDistanceInMetters);
 			
 			List<Document> documents = DBInterface.get().getNearestDocuments(
-					Flyer.ENTITY_PLURAL_NAME, Flyer.LOCATION_FIELD_NAME, longitude, latitude, maxDistanceInMetters, 0);
+					Flyer.ENTITY_PLURAL_NAME, Flyer.LOCATION_FIELD_NAME, longitude, latitude, maxDistanceInMetters * 1000000000, 0);
 			
 			if (documents == null)
 			{

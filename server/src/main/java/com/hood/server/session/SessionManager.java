@@ -2,24 +2,59 @@ package com.hood.server.session;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.hood.server.api.auth.AuthenticationFilter;
+import com.hood.server.model.Session;
+import com.hood.server.services.DBInterface;
+import org.bson.BsonDocument;
+import org.bson.BsonString;
+import org.bson.BsonValue;
+import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class SessionManager
 {
-    private static Cache<String, String> sessionToUser = CacheBuilder.newBuilder().expireAfterAccess(2, TimeUnit.HOURS).build();
-
+    private static String SESSION_COLLECTION_NAME = "sessions";
+    
+    private static Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
+    
     public static String createSession(String email)
     {
-        String session = Long.toString(new Random().nextLong());
-        sessionToUser.put(session, email);
-
-        return session;
+        String sessionId = Long.toString(new Random().nextLong());
+    
+        if (sessionId == null)
+        {
+            logger.error("createSession: session is null for email: {}", email);
+            return null;
+        }
+    
+        Session session = new Session(sessionId, email, new Date());
+        
+        if (!DBInterface.get().addDocument(SESSION_COLLECTION_NAME, session.toBsonObject()))
+        {
+            logger.error("Failed adding document with session for email: {}", email);
+            return null;
+        }
+        
+        return sessionId;
     }
 
-    public static String get(String session)
+    public static String get(String sessionId)
     {
-        return sessionToUser.getIfPresent(session);
+        Session session = new Session(sessionId);
+        Document result = DBInterface.get().getDocument(SESSION_COLLECTION_NAME, session.toBsonObject());
+        
+        if (result == null)
+        {
+            return null;
+        }
+    
+        Session sessionResult = Session.fromBsonDocument(result);
+        
+        return sessionResult.getEmail();
     }
 }

@@ -1,10 +1,13 @@
 package com.hood.server.api.auth;
 
+import com.hood.server.services.DBInterface;
 import com.hood.server.session.SessionManager;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Priority;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -23,22 +26,23 @@ public class AuthenticationFilter implements ContainerRequestFilter
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException
 	{
-		Cookie cookie = requestContext.getCookies().get("JSESSIONID");
+		String session = requestContext.getHeaders().getFirst("session");
 		
-		if (cookie == null)
+		if (session == null)
 		{
-			requestContext.abortWith(Response.status(403).entity("not logged in").build());
+			requestContext.abortWith(Response.status(403).build());
+			return;
 		}
 		
-		String user = SessionManager.get(cookie.getValue());
+		String email = SessionManager.get(session);
 		
-		if (user == null)
+		if (email == null)
 		{
-			requestContext.abortWith(Response.status(403).entity("not logged in").build());
+			requestContext.abortWith(Response.status(403).build());
+			return;
 		}
-		else
-		{
-//            logger.debug("User is: {}", user);
-		}
+		
+		requestContext.setProperty("authenticatedSession", session);
+		requestContext.setProperty("authenticatedEmail", email);
 	}
 }
