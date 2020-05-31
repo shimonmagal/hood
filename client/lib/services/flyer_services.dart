@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:hood/screens/login/session.dart';
 import 'package:http/http.dart' as http;
 import 'package:hood/model/flyer.dart';
 import 'package:hood/model/position.dart';
@@ -7,7 +8,7 @@ import 'package:hood/model/position.dart';
 class FlyerServices {
   static Future<List<Flyer>> fetchFlyers(Position position) async {
     String query = "longitude=${position.longitude}&latitude=${position.latitude}&maxDistanceInMetters=2500";
-    final response = await http.get('http://10.0.2.2:8080/api/flyers?$query');
+    final response = await http.get('http://10.0.2.2:8080/api/flyers?$query', headers: await SessionHelper.internal().authHeaders());
     
     if (response.statusCode == 200) {
       var flyersJson = json.decode(response.body) as List<dynamic>;
@@ -43,11 +44,9 @@ class FlyerServices {
       if (imageKey.isEmpty) {
         return SendFlyerResponse(false, "Missing image key: ${uploadImageResponse.statusCode}", null);
       }
-      
+
       final response = await http.post('http://10.0.2.2:8080/api/flyers',
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
+        headers: await SessionHelper.internal().authHeaders(originalHeaders: {'Content-Type': 'application/json; charset=UTF-8'}),
         body: jsonEncode(<String, dynamic>{
           'title': title,
           'description': description,

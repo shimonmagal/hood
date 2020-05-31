@@ -5,25 +5,38 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:hood/screens/login_screen.dart';
 
-class GoogleLoginView extends StatefulWidget {
-  final LoginViewState parent;
+class GoogleLoginView extends StatefulWidget implements LoginProvider{
+  final LOGIN_TYPES loginType;
+  final Function logInCallback;
+  final Function logOutCallback;
+  final GoogleSignIn googleSignIn = GoogleSignIn(
+    scopes: ['email'],
+  );
 
-  GoogleLoginView(this.parent);
+  GoogleLoginView(this.loginType, this.logInCallback, this.logOutCallback);
 
   @override
   State<StatefulWidget> createState() {
-    return GoogleLoginViewState(this.parent);
+    return GoogleLoginViewState(this.loginType, this.logInCallback, this.logOutCallback, this.googleSignIn);
+  }
+
+  @override
+  logout(BuildContext context) {
+    googleSignIn.signOut();
+
+    this.logOutCallback(context);
   }
 }
 
 class GoogleLoginViewState extends State<GoogleLoginView> {
   Map userProfile;
-  final GoogleSignIn googleSignIn = GoogleSignIn(
-    scopes: ['email'],
-  );
-  final LoginViewState parent;
 
-  GoogleLoginViewState(this.parent);
+  final LOGIN_TYPES loginType;
+  final Function logInCallback;
+  final Function logOutCallback;
+  final googleSignIn;
+
+  GoogleLoginViewState(this.loginType, this.logInCallback, this.logOutCallback, this.googleSignIn);
 
   _loginWithGoogle(context) async {
     final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
@@ -39,7 +52,7 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
         'http://10.0.2.2:8080/api/google?id_token=${googleSignInAuthentication.idToken}');
 
     if (serverResponse.statusCode != 200) {
-      this.parent.logOut(context);
+      this.logOutCallback(context);
 
       return;
     }
@@ -50,50 +63,18 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
       userProfile = profile;
     });
 
-    this.parent.logIn(LOGIN_TYPES.GOOGLE);
-  }
-
-  _logout(context) {
-    googleSignIn.signOut();
-
-    this.parent.logOut(context);
+    this.logInCallback(LOGIN_TYPES.GOOGLE, serverResponse.headers['session'], userProfile);
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: this.parent.loginType == LOGIN_TYPES.GOOGLE
-          ? Column(
-              children: <Widget>[
-                Image.network(
-                  userProfile["picture"],
-                  height: 50.0,
-                  width: 50.0,
-                ),
-                Text(userProfile["name"]),
-                OutlineButton(
-                    child: Text("Continue to app >>"),
-                    onPressed: () {
-                      this.parent.goToApp(context);
-                    }),
-                OutlineButton(
-                  child: Text("Logout"),
-                  onPressed: () {
-                    _logout(context);
-                  },
-                )
-              ],
-            )
-          : Center(
-              child: this.parent.loginType != LOGIN_TYPES.NONE
-                  ? null
-                  : OutlineButton(
-                      child: GoogleSignInButton(
-                        onPressed: () {
-                          _loginWithGoogle(context);
-                        },
-                      ),
-                    ),
+    	child: OutlineButton(
+              child: GoogleSignInButton(
+                onPressed: () {
+                  _loginWithGoogle(context);
+                },
+              ),
             ),
     );
   }

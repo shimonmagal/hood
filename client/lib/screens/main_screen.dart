@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hood/screens/news_screen.dart';
+import 'package:hood/screens/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key}) : super(key: key);
@@ -19,9 +20,7 @@ class MainScreenState extends State<MainScreen> {
     Scaffold(
       body: Text('Not Implemented Yet'),
     ),
-    Scaffold(
-      body: Text('Not Implemented Yet'),
-    ),
+    ProfileForm()
   ];
   
   @override

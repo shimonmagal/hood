@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import com.hood.server.api.auth.Secured;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hood.server.services.DBInterface;
 import com.hood.server.model.Flyer;
 
+@Secured
 @Path("flyers")
 public class FlyersApi
 {

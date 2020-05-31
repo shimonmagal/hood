@@ -2,8 +2,12 @@ package com.hood.server.services;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
+import com.hood.server.model.Session;
+import com.hood.server.model.User;
+import com.mongodb.MongoWriteException;
+import com.mongodb.client.model.*;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +16,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
 
@@ -120,8 +122,13 @@ public class DBInterface
 			logger.info("Building DB Indexes");
 			
 			MongoCollection<Document> flyers = getHoodDatabase().getCollection(Flyer.ENTITY_PLURAL_NAME);
-			
 			flyers.createIndex(Indexes.geo2dsphere("location"));
+			
+			MongoCollection<Document> users = getHoodDatabase().getCollection(User.ENTITY_PLURAL_NAME);
+			users.createIndex(Indexes.text("email"), new IndexOptions().unique(true));
+			
+			MongoCollection<Document> sessions = getHoodDatabase().getCollection(Session.ENTITY_PLURAL_NAME);
+			sessions.createIndex(Indexes.text("session"), new IndexOptions().unique(true));
 			
 			return true;
 		}
@@ -142,8 +149,13 @@ public class DBInterface
 			
 			return true;
 		}
-		catch (Exception e)
+		catch (MongoWriteException e)
 		{
+			if (e.getError().getCode() == 11000) // duplicate
+			{
+				return true;
+			}
+			
 			logger.error("Error saving Document", e);
 			return false;
 		}
@@ -206,8 +218,38 @@ public class DBInterface
 		}
 		catch (Exception e)
 		{
-			logger.error("Error getting Documents", e);
+			logger.error("Error getting nearest Documents", e);
 			return null;
 		}
+	}
+	
+	public Document getDocument(String collectionName, Document document)
+	{
+		try
+		{
+			MongoCollection<Document> collection = getHoodDatabase().getCollection(collectionName);
+			return collection.find(document).first();
+		}
+		catch (Exception e)
+		{
+			logger.error("Error getting Document {}", document, e);
+		}
+		
+		return null;
+	}
+	
+	public boolean deleteDocument(String collectionName, Document document)
+	{
+		try
+		{
+			MongoCollection<Document> collection = getHoodDatabase().getCollection(collectionName);
+			return collection.deleteOne(document).getDeletedCount() > 0;
+		}
+		catch (Exception e)
+		{
+			logger.error("Error deleting Document {}", document, e);
+		}
+		
+		return false;
 	}
 }
