@@ -195,7 +195,7 @@ public class DBInterface
 	{
 		try
 		{
-			Point position = new Point(new Position(latitude, longitude));
+			Point position = new Point(new Position(longitude, latitude));
 			Bson nearFilter = Filters.near(locationFieldName, position, maxDistanceInMetters, minDistanceInMetters);
 			
 			MongoCollection<Document> collection = getHoodDatabase().getCollection(collectionName);

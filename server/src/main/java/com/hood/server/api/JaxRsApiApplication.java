@@ -4,6 +4,7 @@ import com.hood.server.api.auth.AuthenticationFilter;
 import com.hood.server.api.auth.SessionApi;
 import com.hood.server.api.auth.FacebookLoginApi;
 import com.hood.server.api.auth.GoogleLoginApi;
+import com.hood.server.api.auth.EmailPasswordLoginApi;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import javax.ws.rs.core.Application;
@@ -24,6 +25,7 @@ public class JaxRsApiApplication extends Application
 		c.add(AuthenticationFilter.class);
 		c.add(GoogleLoginApi.class);
 		c.add(FacebookLoginApi.class);
+		c.add(EmailPasswordLoginApi.class);
 
 		// app
 		c.add(BlobApi.class);
