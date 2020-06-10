@@ -1,0 +1,15 @@
+[Unit]
+Description=Hood Server
+Wants=syslog.target network.target
+After=syslog.target network.target
+
+[Service]
+UMask=027
+Type=simple
+ExecStart=/opt/hood-server/bin/hood
+WorkingDirectory=/opt/hood-server
+User=hood-server
+Group=hood-server
+
+[Install]
+WantedBy=multi-user.target
