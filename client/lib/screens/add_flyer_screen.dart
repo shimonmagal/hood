@@ -130,7 +130,7 @@ class AddFlyerFormState extends State<AddFlyerForm> {
     Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     
     SendFlyerResponse result = await FlyerServices.sendFlyer(
-        title, description, image, position.latitude, position.longitude);
+        title, description, image, position.longitude, position.latitude);
     
     if (!result.success) {
       await pr.hide();

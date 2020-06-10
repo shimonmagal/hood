@@ -86,7 +86,7 @@ public class FlyersApi
 		}
 		catch (Exception e)
 		{
-			logger.error("Error adding flyer", e);
+			logger.error("Error adding flyer {}", flyerJson, e);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}	
 	}

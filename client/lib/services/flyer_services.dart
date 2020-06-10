@@ -27,7 +27,7 @@ class FlyerServices {
   }
   
   static Future<SendFlyerResponse> sendFlyer(
-      String title, String description, File image, double latitude, double longitude) async {
+      String title, String description, File image, double longitude, double latitude) async {
     try {
       var uri = Uri.parse('http://10.0.2.2:8080/api/file');
       var request = http.MultipartRequest('PUT', uri)
@@ -52,8 +52,8 @@ class FlyerServices {
           'description': description,
           'imageKey': imageKey,
           'location': {
-            'latitude': latitude,
-            'longitude': longitude
+            'longitude': longitude,
+            'latitude': latitude
           }
         }),
       );
