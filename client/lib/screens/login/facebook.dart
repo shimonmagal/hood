@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:hood/screens/login_screen.dart';
+import 'package:global_configuration/global_configuration.dart';
 
 class FacebookLoginView extends StatefulWidget implements LoginProvider{
   final LOGIN_TYPES loginType;
@@ -44,7 +45,7 @@ class FacebookLoginViewState extends State<FacebookLoginView>{
         final token = result.accessToken.token;
 
         final serverResponse = await http
-            .get('http://10.0.2.2:8080/api/facebook?access_token=${token}');
+            .get('${GlobalConfiguration().getString("apiUrl")}/facebook?access_token=${token}');
 
         if (serverResponse.statusCode != 200) {
           this.logOutCallback(context);

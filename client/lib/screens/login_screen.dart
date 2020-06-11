@@ -5,6 +5,7 @@ import 'package:hood/screens/login/google.dart';
 import 'package:flutter/material.dart';
 import 'login/session.dart';
 import 'package:http/http.dart' as http;
+import 'package:global_configuration/global_configuration.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -75,7 +76,7 @@ class LoginViewState extends State<LoginView> {
   }
 
   logOut(context) async {
-    var response = await http.delete('http://10.0.2.2:8080/api/session',
+    var response = await http.delete('${GlobalConfiguration().getString("apiUrl")}/session',
         headers: await SessionHelper.internal().authHeaders());
 
     if (response.statusCode != 200)
@@ -97,7 +98,7 @@ class LoginViewState extends State<LoginView> {
       return;
     }
 
-    var response = await http.get('http://10.0.2.2:8080/api/session',
+    var response = await http.get('${GlobalConfiguration().getString("apiUrl")}/session',
         headers: {"session": session.session});
 
     if (response.statusCode == 200) {
