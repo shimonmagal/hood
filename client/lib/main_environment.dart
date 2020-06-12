@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import "screens/main_screen.dart";
-import 'package:hood/services/flyer_services.dart';
-import 'package:hood/screens/login_screen.dart';
-import 'package:hood/screens/add_flyer_screen.dart';
-import 'package:hood/screens/flyer_viewer_screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:global_configuration/global_configuration.dart';
+import 'package:hood/screens/login_screen.dart';
+import "package:hood/screens/main_screen.dart";
 
 void main(String env) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,6 +13,10 @@ void main(String env) async {
     routes: {
         '/': (context) => MainScreen(),
         '/login': (context) => LoginView()
-    }
+    },
+    supportedLocales: [
+	  const Locale('en'), // English
+	  const Locale('he'), // Hebrew
+	]
   ));
 }

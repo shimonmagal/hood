@@ -12,7 +12,8 @@ class FlyerServices {
     final response = await http.get('${GlobalConfiguration().getString("apiUrl")}/flyers?$query', headers: await SessionHelper.internal().authHeaders());
     
     if (response.statusCode == 200) {
-      var flyersJson = json.decode(response.body) as List<dynamic>;
+      var bodyAsString = utf8.decode(response.bodyBytes);
+      var flyersJson = json.decode(bodyAsString) as List<dynamic>;
       
       try {
         List<Flyer> result = flyersJson.map((flyerJson) => Flyer.fromJson(flyerJson)).toList();

@@ -23,10 +23,8 @@ class LoginViewState extends State<LoginView> {
   void initState() {
     super.initState();
 
-    this.facebookProvider =
-    new FacebookLoginView(this.loginType, this.logIn, this.logOut);
-    this.googleProvider =
-    new GoogleLoginView(this.loginType, this.logIn, this.logOut);
+    this.facebookProvider = new FacebookLoginView(this.loginType, this.logIn, this.logOut);
+    this.googleProvider = new GoogleLoginView(this.loginType, this.logIn, this.logOut);
 
     useSessionIfPossible();
   }
@@ -93,14 +91,14 @@ class LoginViewState extends State<LoginView> {
 
   void useSessionIfPossible() async {
     var session = await SessionHelper.internal().getSession();
-
+    
     if (session == null) {
       return;
     }
 
     var response = await http.get('${GlobalConfiguration().getString("apiUrl")}/session',
         headers: {"session": session.session});
-
+    
     if (response.statusCode == 200) {
       logIn(session.loginType, session.session, json.decode(response.body));
     }
