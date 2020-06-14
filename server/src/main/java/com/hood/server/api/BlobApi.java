@@ -60,6 +60,12 @@ public class BlobApi
 			
 			logger.info("Getting blob: {} {}", key, file);
 			
+			if (!file.canRead())
+			{
+				logger.info("Unable to read blob file {}", file);
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			}
+			
 			return Response.ok(file).build();
 		}
 		catch (Exception e)

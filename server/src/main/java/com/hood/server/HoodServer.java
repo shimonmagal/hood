@@ -16,6 +16,8 @@ import com.hood.server.api.JaxRsApiApplication;
 import com.hood.server.services.DBInterface;
 import com.hood.server.services.BlobInterface;
 
+import com.hood.server.config.HoodConfig;
+
 public class HoodServer
 {
 	private static final int DEFAULT_PORT = 8080;
@@ -24,6 +26,11 @@ public class HoodServer
 	
 	private static boolean initializeServices()
 	{
+		if (HoodConfig.get() == null)
+		{
+			return false;
+		}
+		
 		if (!DBInterface.get().initialize())
 		{
 			return false;
@@ -44,16 +51,9 @@ public class HoodServer
 			return;
 		}
 		
-		int port = DEFAULT_PORT;
+		HttpServer server = HttpServer.create(new InetSocketAddress(HoodConfig.get().serverPort()), 0);
 		
-		if (args.length > 0)
-		{
-			port = Integer.parseInt(args[0]);
-		}
-		
-		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-		
-		logger.info("Listening on port: {}", port);
+		logger.info("Listening on port: {}", HoodConfig.get().serverPort());
 		
 		HttpHandler apiHandler = RuntimeDelegate.getInstance().createEndpoint(new JaxRsApiApplication(), HttpHandler.class);
 		server.createContext("/api", apiHandler);

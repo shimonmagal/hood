@@ -83,6 +83,8 @@ class AddFlyerFormState extends State<AddFlyerForm> {
                   icon: const Icon(Icons.description),
                   hintText: 'Enter description'
                 ),
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
               ),
               FormField<String>(
                 builder: (context) => Column(

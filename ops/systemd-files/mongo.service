@@ -1,0 +1,17 @@
+[Unit]
+Description=MongoDB Server
+After=syslog.target
+After=network.target
+
+[Service]
+Environment=HOOD_ENVIRONMENT=prod
+
+UMask=027
+Type=simple
+ExecStart=/opt/mongo/bin/mongod --dbpath /mnt/storage/mongo-data --logpath /var/log/mongo/mongod.log --setParameter honorSystemUmask=true
+WorkingDirectory=/opt/mongo
+User=hood-server
+Group=hood-server
+
+[Install]
+WantedBy=multi-user.target

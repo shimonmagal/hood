@@ -24,6 +24,8 @@ import org.bson.conversions.Bson;
 
 import com.hood.server.model.Flyer;
 
+import com.hood.server.config.HoodConfig;
+
 public class DBInterface
 {
 	private static final Logger logger = LoggerFactory.getLogger(DBInterface.class);
@@ -51,7 +53,7 @@ public class DBInterface
 	
 	private static DBInterface createLocal()
 	{
-		String mongoAddress = "localhost:27017";
+		String mongoAddress = HoodConfig.get().mongoUrl();
 		MongoClient mongoClient = null;
 		
 		try

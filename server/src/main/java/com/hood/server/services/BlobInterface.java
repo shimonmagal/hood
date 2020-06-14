@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hood.server.config.HoodConfig;
+
 public class BlobInterface
 {
 	private static final Logger logger = LoggerFactory.getLogger(BlobInterface.class);
@@ -35,7 +37,7 @@ public class BlobInterface
 	
 	private static BlobInterface createLocal()
 	{
-		File storageDirectory = new File(".storage");
+		File storageDirectory = new File(HoodConfig.get().localStorageDirectory());
 		
 		logger.info("Initialzing local stroage directory {}", storageDirectory.getAbsolutePath());
 		

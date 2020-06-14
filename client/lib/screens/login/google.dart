@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:hood/screens/login_screen.dart';
+import 'package:global_configuration/global_configuration.dart';
 
 class GoogleLoginView extends StatefulWidget implements LoginProvider{
   final LOGIN_TYPES loginType;
@@ -49,7 +50,7 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
         await googleSignInAccount.authentication;
 
     final serverResponse = await http.get(
-        'http://10.0.2.2:8080/api/google?id_token=${googleSignInAuthentication.idToken}');
+        '${GlobalConfiguration().getString("apiUrl")}/google?id_token=${googleSignInAuthentication.idToken}');
 
     if (serverResponse.statusCode != 200) {
       this.logOutCallback(context);
