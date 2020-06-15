@@ -23,22 +23,15 @@ class FacebookLoginView extends StatefulWidget implements LoginProvider{
 
   @override
   State<StatefulWidget> createState() {
-    return FacebookLoginViewState(this.loginType, this.logInCallback, this.logOutCallback, this.facebookLogin);
+    return FacebookLoginViewState();
   }
 }
 
 class FacebookLoginViewState extends State<FacebookLoginView>{
   Map userProfile;
 
-  final LOGIN_TYPES loginType;
-  final Function logInCallback;
-  final Function logOutCallback;
-  final facebookLogin;
-
-  FacebookLoginViewState(this.loginType, this.logInCallback, this.logOutCallback, this.facebookLogin);
-
   _loginWithFB(context) async {
-    final result = await facebookLogin.logIn(['email']);
+    final result = await widget.facebookLogin.logIn(['email']);
 
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
@@ -48,7 +41,7 @@ class FacebookLoginViewState extends State<FacebookLoginView>{
             .get('${GlobalConfiguration().getString("apiUrl")}/facebook?access_token=${token}');
 
         if (serverResponse.statusCode != 200) {
-          this.logOutCallback(context);
+          widget.logOutCallback(context);
           return;
         }
 
@@ -60,15 +53,15 @@ class FacebookLoginViewState extends State<FacebookLoginView>{
 
         userProfile["picture"] = userProfile["picture"]["data"]["url"];
 
-        this.logInCallback(LOGIN_TYPES.FACEBOOK, serverResponse.headers['session'], profile);
+        widget.logInCallback(LOGIN_TYPES.FACEBOOK, serverResponse.headers['session'], profile);
 
         break;
 
       case FacebookLoginStatus.cancelledByUser:
-        this.logOutCallback(context);
+        widget.logOutCallback(context);
         break;
       case FacebookLoginStatus.error:
-        this.logOutCallback(context);
+        widget.logOutCallback(context);
         break;
     }
   }

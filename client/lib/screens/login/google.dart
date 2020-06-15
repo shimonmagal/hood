@@ -18,7 +18,7 @@ class GoogleLoginView extends StatefulWidget implements LoginProvider{
 
   @override
   State<StatefulWidget> createState() {
-    return GoogleLoginViewState(this.loginType, this.logInCallback, this.logOutCallback, this.googleSignIn);
+    return GoogleLoginViewState();
   }
 
   @override
@@ -32,15 +32,10 @@ class GoogleLoginView extends StatefulWidget implements LoginProvider{
 class GoogleLoginViewState extends State<GoogleLoginView> {
   Map userProfile;
 
-  final LOGIN_TYPES loginType;
-  final Function logInCallback;
-  final Function logOutCallback;
-  final googleSignIn;
-
-  GoogleLoginViewState(this.loginType, this.logInCallback, this.logOutCallback, this.googleSignIn);
+  GoogleLoginViewState();
 
   _loginWithGoogle(context) async {
-    final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAccount googleSignInAccount = await widget.googleSignIn.signIn();
 
     if (googleSignInAccount == null) {
       return;
@@ -53,7 +48,7 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
         '${GlobalConfiguration().getString("apiUrl")}/google?id_token=${googleSignInAuthentication.idToken}');
 
     if (serverResponse.statusCode != 200) {
-      this.logOutCallback(context);
+      widget.logOutCallback(context);
 
       return;
     }
@@ -64,7 +59,7 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
       userProfile = profile;
     });
 
-    this.logInCallback(LOGIN_TYPES.GOOGLE, serverResponse.headers['session'], userProfile);
+    widget.logInCallback(LOGIN_TYPES.GOOGLE, serverResponse.headers['session'], userProfile);
   }
 
   @override
