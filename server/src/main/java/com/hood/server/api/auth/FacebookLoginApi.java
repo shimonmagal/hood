@@ -90,7 +90,6 @@ public class FacebookLoginApi
 		catch (Exception e)
 		{
 			logger.error("Facebook login failed", e);
-			e.printStackTrace();
 			
 			return Response.serverError().entity("Error occurred in server").build();
 		}

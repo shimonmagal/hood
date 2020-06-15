@@ -68,7 +68,7 @@ public class GoogleLoginApi
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.error("Google login failed", e);
 			
 			return Response.serverError().entity("Error occurred in server").build();
 		}

@@ -18,7 +18,9 @@ public class JaxRsApiApplication extends Application
 	{
 		Set<Class<?>> c = new HashSet<Class<?>>();
 		
+		// infra
 		c.add(MultiPartFeature.class);
+		c.add(LogAllExceptions.class);
 
 		// auth
 		c.add(SessionApi.class);
@@ -30,6 +32,7 @@ public class JaxRsApiApplication extends Application
 		// app
 		c.add(BlobApi.class);
 		c.add(FlyersApi.class);
+		c.add(MessagesApi.class);
 		
 		classes = Collections.unmodifiableSet(c);
 	}
