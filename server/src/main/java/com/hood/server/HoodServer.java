@@ -1,18 +1,20 @@
 package com.hood.server;
 
 import java.net.InetSocketAddress;
-import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
+import com.hood.server.api.JaxRsApiResourceConfig;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpContainerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.ext.RuntimeDelegate;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
 
-import com.hood.server.api.JaxRsApiApplication;
 import com.hood.server.services.DBInterface;
 import com.hood.server.services.BlobInterface;
 
@@ -51,16 +53,20 @@ public class HoodServer
 			return;
 		}
 		
-		HttpServer server = HttpServer.create(new InetSocketAddress(HoodConfig.get().serverPort()), 0);
 		
-		logger.info("Listening on port: {}", HoodConfig.get().serverPort());
+		HttpServer server = HttpServer.createSimpleServer("/", HoodConfig.get().serverPort());
 		
-		HttpHandler apiHandler = RuntimeDelegate.getInstance().createEndpoint(new JaxRsApiApplication(), HttpHandler.class);
-		server.createContext("/api", apiHandler);
+		HttpHandler apiHandler = new GrizzlyHttpContainerProvider()
+				.createContainer(HttpHandler.class, JaxRsApiResourceConfig.create());
+		server.getServerConfiguration().addHttpHandler(apiHandler, "/api");
 		
-		ExecutorService clientsThreadPool = Executors.newFixedThreadPool(100);
-		server.setExecutor(Executors.newFixedThreadPool(100));
-
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				server.shutdownNow();
+			}
+		}));
+		
 		server.start();
 	}
 }

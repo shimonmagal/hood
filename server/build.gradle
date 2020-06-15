@@ -27,6 +27,7 @@ dependencies {
 	compile 'org.mongodb:mongodb-driver-sync:4.0.3'
 	compile 'org.cfg4j:cfg4j-core:4.4.1'
 	compile 'org.apache.commons:commons-lang3:3.10'
+	compile 'org.glassfish.jersey.containers:jersey-container-grizzly2-http:2.31'
 }
 
 distributions {
