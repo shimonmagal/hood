@@ -2,9 +2,15 @@ package com.hood.server.services;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import com.hood.server.model.Message;
 import com.hood.server.model.Session;
 import com.hood.server.model.User;
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.model.*;
 import org.bson.types.ObjectId;
@@ -31,6 +37,46 @@ public class DBInterface
 	private static final Logger logger = LoggerFactory.getLogger(DBInterface.class);
 	
 	private static DBInterface instance;
+
+	public enum LogicalOperator
+	{
+		AND("$and"),
+		OR("$or");
+		
+		private String mongoSyntax;
+		
+		LogicalOperator(String mongoSyntax)
+		{
+			this.mongoSyntax = mongoSyntax;
+		}
+		
+		public String mongoSyntax()
+		{
+			return mongoSyntax;
+		}
+	}
+	
+	public enum Operator
+	{
+		EQUALS // todo other operators
+	}
+	
+	public static class OperatorAndValue
+	{
+		Operator op;
+		String val;
+		
+		private OperatorAndValue(Operator op, String val)
+		{
+			this.op = op;
+			this.val = val;
+		}
+		
+		public static OperatorAndValue of(Operator op, String val)
+		{
+			return new OperatorAndValue(op, val);
+		}
+	}
 	
 	public static DBInterface get()
 	{
@@ -132,6 +178,10 @@ public class DBInterface
 			MongoCollection<Document> sessions = getHoodDatabase().getCollection(Session.ENTITY_PLURAL_NAME);
 			sessions.createIndex(Indexes.text("session"), new IndexOptions().unique(true));
 			
+			MongoCollection<Document> messages = getHoodDatabase().getCollection(Message.ENTITY_PLURAL_NAME);
+			messages.createIndex(Indexes.compoundIndex(Indexes.text("senderUser"), Indexes.text("receiverUser")), new IndexOptions().unique(false));
+			messages.createIndex(Indexes.ascending("date"), new IndexOptions().expireAfter(5L, TimeUnit.DAYS));
+			
 			return true;
 		}
 		catch (Exception e)
@@ -169,6 +219,46 @@ public class DBInterface
 		{
 			MongoCollection<Document> collection = getHoodDatabase().getCollection(collectionName);
 			MongoCursor<Document> cursor = collection.find().iterator();
+			List<Document> result = new ArrayList();
+			
+			try
+			{
+				while (cursor.hasNext())
+				{
+					result.add(cursor.next());
+				}
+			}
+			finally
+			{
+				cursor.close();
+			}
+			
+			return result;
+		}
+		catch (Exception e)
+		{
+			logger.error("Error getting Documents", e);
+			return null;
+		}
+	}
+	
+	public List<Document> query(String collectionName, LogicalOperator logicOp, Map<String, OperatorAndValue> fieldToOperatorAndValue)
+	{
+		BasicDBList compoundQuery = new BasicDBList();
+		
+		for (Map.Entry<String, OperatorAndValue> fieldEntry : fieldToOperatorAndValue.entrySet())
+		{
+			// only equals supported now - todo
+			DBObject clause = new BasicDBObject(fieldEntry.getKey(), fieldEntry.getValue().val);
+			compoundQuery.add(clause);
+		}
+		
+		BasicDBObject query = new BasicDBObject(logicOp.mongoSyntax(), compoundQuery);
+		
+		try
+		{
+			MongoCollection<Document> collection = getHoodDatabase().getCollection(collectionName);
+			MongoCursor<Document> cursor = collection.find(query).iterator();
 			List<Document> result = new ArrayList();
 			
 			try
