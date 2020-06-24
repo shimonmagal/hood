@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hood/model/flyer.dart';
+import 'package:hood/screens/login/session.dart';
 import 'package:hood/screens/messages_conversation_screen.dart';
 import 'package:hood/services/blob_services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -62,8 +63,10 @@ class FlyerViewerFormState extends State<FlyerViewerForm> {
                   IconButton(
                     icon: new Icon(Icons.message, size: 40, color: Colors.orangeAccent),
                     onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => ConversationForm(widget.flyer))
+                      SessionHelper.internal().getSession().then((session) =>
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => ConversationForm(widget.flyer, session.username))
+                        )
                       );
                     },
                   ),

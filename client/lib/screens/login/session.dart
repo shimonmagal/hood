@@ -6,6 +6,7 @@ import 'package:hood/screens/login_screen.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/material.dart';
 
 class SessionHelper {
   static final SessionHelper _instance = new SessionHelper.internal();
@@ -61,6 +62,17 @@ class SessionHelper {
 
     res = await dbClient.insert(TABLE_NAME, map, conflictAlgorithm: ConflictAlgorithm.replace);
 
+    if (res <= 0)
+    {
+      return false;
+    }
+
+    map = new HashMap();
+    map.putIfAbsent(KEY_COLUMN, () => "username");
+    map.putIfAbsent(VALUE_COLUMN, () => session.username.toString());
+
+    res = await dbClient.insert(TABLE_NAME, map, conflictAlgorithm: ConflictAlgorithm.replace);
+
     return res > 0;
   }
 
@@ -79,6 +91,8 @@ class SessionHelper {
 
     String session;
     var loginType;
+    String username;
+
     for (var row in result)
     {
       if (row[KEY_COLUMN] == "session")
@@ -94,9 +108,13 @@ class SessionHelper {
           default: loginType = LOGIN_TYPES.NONE;
         }
       }
+      else if (row[KEY_COLUMN] == "username")
+      {
+        username = row[VALUE_COLUMN];
+      }
     }
 
-    return new Session(session, loginType);
+    return new Session(session, loginType, username);
   }
 
   Future<bool> removeSession() async
@@ -132,6 +150,7 @@ class Session
 {
   String session;
   LOGIN_TYPES loginType;
+  String username;
 
-  Session(this.session, this.loginType);
+  Session(this.session, this.loginType, this.username);
 }

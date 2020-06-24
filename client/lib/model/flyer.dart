@@ -2,15 +2,17 @@ import 'package:hood/model/position.dart';
 import 'package:geolocator/geolocator.dart' as Geolocator;
 
 class Flyer {
+  final String id;
+  final String user;
   final String title;
   final String description;
   final String imageKey;
   final Position location;
   
-  Flyer(this.title, this.description, this.imageKey, this.location);
+  Flyer(this.id, this.user, this.title, this.description, this.imageKey, this.location);
   
   factory Flyer.fromJson(Map json) {
-    return Flyer(json['title'], json['description'], json['imageKey'], Position.fromJson(json['location']));
+    return Flyer(json['id'], json['user'], json['title'], json['description'], json['imageKey'], Position.fromJson(json['location']));
   }
   
   Future<List<Geolocator.Placemark>> getLocationAddress() {

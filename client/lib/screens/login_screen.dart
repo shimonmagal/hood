@@ -49,8 +49,9 @@ class LoginViewState extends State<LoginView> {
       this.loginType = loginType;
     });
 
-    if (await SessionHelper.internal().saveSession(
-        new Session(session, loginType))) {
+    String username = user["email"];
+
+    if (await SessionHelper.internal().saveSession(new Session(session, loginType, username))) {
       goToApp(context, user, loginType);
     }
   }
