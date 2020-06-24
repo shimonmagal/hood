@@ -17,50 +17,27 @@ public class Flyer
 	public static final String LOCATION_FIELD_NAME = "location";
 	
 	private final String id;
+	private final String user;
 	private final String title;
 	private final String description;
 	private final String imageKey;
 	private final Position location;
 	
-	public Flyer(String id, String title, String description, String imageKey, Position location)
+	public Flyer(String id, String user, String title, String description, String imageKey, Position location)
 	{
 		this.id = id;
+		this.user = user;
 		this.title = title;
 		this.description = description;
 		this.imageKey = imageKey;
 		this.location = location;
 	}
 	
-	public String getId()
-	{
-		return id;
-	}
-	
-	public String getTitle()
-	{
-		return title;
-	}
-	
-	public String getDescription()
-	{
-		return description;
-	}
-	
-	public String getImageKey()
-	{
-		return imageKey;
-	}
-	
-	public Position getLocation()
-	{
-		return location;
-	}
-	
 	@Override
 	public String toString()
 	{
-		return String.format("(id: %s) (title: %s) (description: %s) (image: %s) (loc: %s)", 
-			id, title, description, imageKey, location);
+		return String.format("(id: %s) (user: %s) (title: %s) (description: %s) (image: %s) (loc: %s)",
+			id, user, title, description, imageKey, location);
 	}
 	
 	public Document toBsonObject()
@@ -69,7 +46,12 @@ public class Flyer
 		
 		if (id != null)
 		{
-			bson.append("_id", id);
+			bson.append("id", id);
+		}
+		
+		if (user != null)
+		{
+			bson.append("user", user);
 		}
 		
 		if (title != null)
@@ -95,6 +77,36 @@ public class Flyer
 		return bson;
 	}
 	
+	public String getId()
+	{
+		return id;
+	}
+	
+	public String getUser()
+	{
+		return user;
+	}
+	
+	public String getTitle()
+	{
+		return title;
+	}
+	
+	public String getDescription()
+	{
+		return description;
+	}
+	
+	public String getImageKey()
+	{
+		return imageKey;
+	}
+	
+	public Position getLocation()
+	{
+		return location;
+	}
+	
 	public static Flyer fromBsonObject(Document bson)
 	{
 		Object locationDoc = bson.get(LOCATION_FIELD_NAME);
@@ -107,6 +119,7 @@ public class Flyer
 		
 		return new Builder()
 			.withId(bson.getObjectId("_id").toString())
+			.withUser(bson.getString("user"))
 			.withTitle(bson.getString("title"))
 			.withDescription(bson.getString("description"))
 			.withImageKey(bson.getString("imageKey"))
@@ -118,6 +131,7 @@ public class Flyer
 	public static class Builder
 	{
 		private String id;
+		private String user;
 		private String title;
 		private String description;
 		private String imageKey;
@@ -126,6 +140,12 @@ public class Flyer
 		public Builder withId(String id)
 		{
 			this.id = id;
+			return this;
+		}
+		
+		public Builder withUser(String user)
+		{
+			this.user = user;
 			return this;
 		}
 		
@@ -153,9 +173,39 @@ public class Flyer
 			return this;
 		}
 		
+		public String getId()
+		{
+			return id;
+		}
+		
+		public String getUser()
+		{
+			return user;
+		}
+		
+		public String getTitle()
+		{
+			return title;
+		}
+		
+		public String getDescription()
+		{
+			return description;
+		}
+		
+		public String getImageKey()
+		{
+			return imageKey;
+		}
+		
+		public Position getLocation()
+		{
+			return location;
+		}
+		
 		public Flyer build()
 		{
-			return new Flyer(id, title, description, imageKey, location);
+			return new Flyer(id, user, title, description, imageKey, location);
 		}
 	}
 }

@@ -1,19 +1,13 @@
 package com.hood.server;
 
-import java.net.InetSocketAddress;
-import java.text.SimpleDateFormat;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
-
-import com.hood.server.api.JaxRsApiResourceConfig;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.server.Request;
+import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.websockets.WebSocketAddOn;
+import org.glassfish.grizzly.websockets.WebSocketEngine;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpContainerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.ext.RuntimeDelegate;
 
 import com.hood.server.services.DBInterface;
 import com.hood.server.services.BlobInterface;
@@ -56,10 +50,21 @@ public class HoodServer
 		
 		HttpServer server = HttpServer.createSimpleServer("/", HoodConfig.get().serverPort());
 		
+		// api
 		HttpHandler apiHandler = new GrizzlyHttpContainerProvider()
 				.createContainer(HttpHandler.class, JaxRsApiResourceConfig.create());
 		server.getServerConfiguration().addHttpHandler(apiHandler, "/api");
 		
+		// message websocket
+		WebSocketAddOn addOn = new WebSocketAddOn();
+		addOn.setTimeoutInSeconds(60);
+		for (NetworkListener listener : server.getListeners()) {
+			listener.registerAddOn(addOn);
+		}
+		
+		WebSocketEngine.getEngine().register("", "/messages", new MessageHandler());
+		
+		// shutdown hook
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			@Override
 			public void run() {

@@ -4,24 +4,18 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import com.hood.server.model.Message;
 import com.hood.server.model.Session;
 import com.hood.server.model.User;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.MongoWriteException;
+import com.mongodb.*;
+import com.mongodb.client.*;
 import com.mongodb.client.model.*;
-import org.bson.types.ObjectId;
+import com.mongodb.client.model.changestream.ChangeStreamDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
 
@@ -179,7 +173,7 @@ public class DBInterface
 			sessions.createIndex(Indexes.text("session"), new IndexOptions().unique(true));
 			
 			MongoCollection<Document> messages = getHoodDatabase().getCollection(Message.ENTITY_PLURAL_NAME);
-			messages.createIndex(Indexes.compoundIndex(Indexes.text("senderUser"), Indexes.text("receiverUser")), new IndexOptions().unique(false));
+			messages.createIndex(Indexes.compoundIndex(Indexes.text("customerUser"), Indexes.text("flyerId")), new IndexOptions().unique(false));
 			messages.createIndex(Indexes.ascending("date"), new IndexOptions().expireAfter(5L, TimeUnit.DAYS));
 			
 			return true;
@@ -343,5 +337,31 @@ public class DBInterface
 		}
 		
 		return false;
+	}
+	
+	public boolean watch(String collectionName, Consumer<Message> action)
+	{
+		try
+		{
+			MongoCollection<Document> collection = getHoodDatabase().getCollection(collectionName);
+			ChangeStreamIterable<Document> publisher = collection.watch();
+			
+			publisher.forEach(x -> {
+				action.accept(Message.fromBsonObject(x.getFullDocument()));
+			});
+		}
+		catch (MongoCommandException e)
+		{
+			if (e.getErrorCode() == 40573)
+			{
+				logger.info("Watch not supported for collection: {}", collectionName);
+				return false;
+			}
+			
+			logger.error("Error watching collection {}", collectionName);
+			return false;
+		}
+		
+		return true;
 	}
 }

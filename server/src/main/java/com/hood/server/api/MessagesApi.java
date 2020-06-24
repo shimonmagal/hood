@@ -8,77 +8,65 @@ import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.hood.server.services.DBInterface.LogicalOperator;
 import static com.hood.server.services.DBInterface.Operator;
 import static com.hood.server.services.DBInterface.OperatorAndValue;
 
-@Path("messages")
 public class MessagesApi
 {
 	private static final Logger logger = LoggerFactory.getLogger(MessagesApi.class);
 	
-	@PUT
-	@Consumes(MediaType.TEXT_PLAIN)
-	public Response pushMessage(@QueryParam("flyerId") String flyerId,
-	                            @QueryParam("receiverUser") String receiverUser,
-	                            @QueryParam("date") String dateString,
-	                            String text,
-	                            @Context ContainerRequestContext requestContext)
+	public static boolean pushMessage(String messageStr, String senderUser, Consumer<Message> consumer)
 	{
-		Object authenticatedEmail = requestContext.getProperty("authenticatedEmail");
-		
-		if (authenticatedEmail == null)
+		try
 		{
-			logger.error("checkSession: authenticatedEmail is null");
-			return Response.status(403).build();
+			ObjectMapper jsonMapper = new ObjectMapper();
+			Message.Builder messageBuilder = jsonMapper.readValue(messageStr, Message.Builder.class);
+			messageBuilder.withSenderUser(senderUser);
+			Message message = messageBuilder.build();
+			
+			if (consumer != null)
+			{
+				consumer.accept(message);
+			}
+			
+			Document messageDoc = message.toBsonObject();
+			return DBInterface.get().addDocument(Message.ENTITY_PLURAL_NAME, messageDoc);
 		}
-		
-		String sender = authenticatedEmail.toString();
-		
-		Date date = new Date(Long.parseLong(dateString));
-		
-		Document message = new Message(flyerId, sender, receiverUser, date, text).toBsonObject();
-		DBInterface.get().addDocument(Message.ENTITY_PLURAL_NAME, message);
-		
-		return Response.ok().build();
+		catch (Exception e)
+		{
+			logger.error("Failed to pushMessage: {}", messageStr, e);
+			return false;
+		}
 	}
 	
-	@GET
-	public Response getAllMessage(@Context ContainerRequestContext requestContext)
+	public static String getAllMessageInConversation(String authenticactedUser, String initiatingUser, String flyerId)
 	{
-		Object authenticatedEmail = requestContext.getProperty("authenticatedEmail");
-		
-		if (authenticatedEmail == null)
+		if (!initiatingUser.equals(authenticactedUser))
 		{
-			logger.error("checkSession: authenticatedEmail is null");
-			return Response.status(403).build();
+			if (!FlyersApi.validateFlyerIsByUser(flyerId, authenticactedUser))
+			{
+				return null;
+			}
 		}
-		
-		String user = authenticatedEmail.toString();
 		
 		try
 		{
 			Map<String, OperatorAndValue> fieldToOperatorAndValue = Maps.newHashMap();
 			
-			fieldToOperatorAndValue.put("senderUser", OperatorAndValue.of(Operator.EQUALS, user));
-			fieldToOperatorAndValue.put("receiverUser", OperatorAndValue.of(Operator.EQUALS, user));
+			fieldToOperatorAndValue.put("cusomterUser", OperatorAndValue.of(Operator.EQUALS, initiatingUser));
+			fieldToOperatorAndValue.put("flyerId", OperatorAndValue.of(Operator.EQUALS, flyerId));
 			
 			List<Document> documents = DBInterface.get().query(Message.ENTITY_PLURAL_NAME, LogicalOperator.OR, fieldToOperatorAndValue);
 			
 			if (documents == null)
 			{
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+				return null;
 			}
 			
 			List<Message> messages = documents.stream()
@@ -89,15 +77,24 @@ public class MessagesApi
 			ObjectMapper jsonMapper = new ObjectMapper();
 			String resultJson = jsonMapper.writeValueAsString(messages);
 			
-			return Response
-					.status(Response.Status.OK)
-					.entity(resultJson)
-					.build();
+			return resultJson;
 		}
 		catch (Exception e)
 		{
 			logger.error("Error getting message", e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+			return null;
 		}
+	}
+	
+	public static boolean wathcForUpdates(Consumer<Message> consumer)
+	{
+		if (DBInterface.get().watch(Message.ENTITY_PLURAL_NAME, consumer))
+		{
+			return true;
+		}
+		
+		logger.warn("watch for messages is not supported");
+		
+		return false;
 	}
 }

@@ -1,4 +1,4 @@
-package com.hood.server.api;
+package com.hood.server;
 
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;

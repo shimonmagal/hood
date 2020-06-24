@@ -16,49 +16,27 @@ public class Message
 	public static final String ENTITY_PLURAL_NAME = "messages";
 	
 	private final String flyerId;
+	private final String customerUser;
 	private final String senderUser;
 	private final String receiverUser;
 	private final Date date;
 	private final String text;
 	
-	public Message(String flyerId, String senderUser, String receiverUser, Date date, String text)
+	public Message(String flyerId, String customerUser, String senderUser, String receiverUser, Date date, String text)
 	{
 		this.flyerId = flyerId;
+		this.customerUser = customerUser;
 		this.senderUser = senderUser;
 		this.receiverUser = receiverUser;
 		this.date = date;
 		this.text = text;
 	}
 	
-	public String getFlyerId()
-	{
-		return flyerId;
-	}
-	
-	public String getSenderUser()
-	{
-		return senderUser;
-	}
-	
-	public String getReceiverUser()
-	{
-		return receiverUser;
-	}
-	
-	public Date getDate()
-	{
-		return date;
-	}
-	
-	public String getText()
-	{
-		return text;
-	}
-	
 	public static Message fromBsonObject(Document bson)
 	{
 		return new Message.Builder()
 				.withFlyerId(bson.getString("flyerId"))
+				.withCustomerUser(bson.getString("customerUser"))
 				.withSenderUser(bson.getString("senderUser"))
 				.withReceiverUser(bson.getString("receiverUser"))
 				.withDate(bson.getDate("date"))
@@ -73,6 +51,11 @@ public class Message
 		if (flyerId != null)
 		{
 			bson.append("flyerId", flyerId);
+		}
+		
+		if (customerUser != null)
+		{
+			bson.append("customerUser", customerUser);
 		}
 		
 		if (senderUser != null)
@@ -101,14 +84,46 @@ public class Message
 	@Override
 	public String toString()
 	{
-		return String.format("(flyerId: %s) (senderUser: %s) (receiverUser: %s) (date: %s) (text: %s)",
-				flyerId, senderUser, receiverUser, date, text);
+		return String.format("(flyerId: %s) (customerUser: %s) (senderUser: %s)  (receiverUser: %s) (date: %s) (text: %s)",
+				flyerId, customerUser, senderUser, receiverUser, date, text);
+	}
+	
+	
+	public String getFlyerId()
+	{
+		return flyerId;
+	}
+	
+	public String getCustomerUser()
+	{
+		return customerUser;
+	}
+	
+	public String getSenderUser()
+	{
+		return senderUser;
+	}
+	
+	public String getReceiverUser()
+	{
+		return receiverUser;
+	}
+	
+	public Date getDate()
+	{
+		return date;
+	}
+	
+	public String getText()
+	{
+		return text;
 	}
 	
 	@JsonPOJOBuilder
 	public static class Builder
 	{
 		private String flyerId;
+		private String customerUser;
 		private String senderUser;
 		private String receiverUser;
 		private Date date;
@@ -117,6 +132,12 @@ public class Message
 		public Message.Builder withFlyerId(String flyerId)
 		{
 			this.flyerId = flyerId;
+			return this;
+		}
+		
+		public Message.Builder withCustomerUser(String customerUser)
+		{
+			this.customerUser = customerUser;
 			return this;
 		}
 		
@@ -144,9 +165,38 @@ public class Message
 			return this;
 		}
 		
+		public String getFlyerId()
+		{
+			return flyerId;
+		}
+		
+		public String getCustomerUser()
+		{
+			return customerUser;
+		}
+		
+		public String getSenderUser()
+		{
+			return senderUser;
+		}
+		
+		public String getReceiverUser()
+		{
+			return receiverUser;
+		}
+		public Date getDate()
+		{
+			return date;
+		}
+		
+		public String getText()
+		{
+			return text;
+		}
+		
 		public Message build()
 		{
-			return new Message(flyerId, senderUser, receiverUser, date, text);
+			return new Message(flyerId, customerUser, senderUser, receiverUser, date, text);
 		}
 	}
 }
