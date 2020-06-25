@@ -6,18 +6,18 @@ import 'package:hood/screens/login/session.dart';
 import 'package:intl/intl.dart';
 import 'package:web_socket_channel/io.dart';
 
-class ConversationForm extends StatefulWidget {
+class ConversationMessagesForm extends StatefulWidget {
   final String flyerId;
   final String flyerUser;
   final String customerUser;
 
-  ConversationForm(this.flyerId, this.flyerUser, this.customerUser);
+  ConversationMessagesForm(this.flyerId, this.flyerUser, this.customerUser);
 
   @override
-  ConversationFormState createState() => ConversationFormState();
+  ConversationMessagesFormState createState() => ConversationMessagesFormState();
 }
 
-class ConversationFormState extends State<ConversationForm> {
+class ConversationMessagesFormState extends State<ConversationMessagesForm> {
   IOWebSocketChannel webSocketChannel;
   List<Map<String, dynamic>> messages;
   double height, width;

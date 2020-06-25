@@ -1,5 +1,7 @@
 package com.hood.server;
 
+import com.hood.server.ws.ConversationWebSocket;
+import com.hood.server.ws.MessagesWebSocket;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
@@ -62,8 +64,8 @@ public class HoodServer
 			listener.registerAddOn(addOn);
 		}
 		
-		WebSocketEngine.getEngine().register("", "/messages", new MessageHandler());
-		WebSocketEngine.getEngine().register("", "/conversations", new ConversationHandler());
+		WebSocketEngine.getEngine().register("", "/conversations", new ConversationWebSocket());
+		WebSocketEngine.getEngine().register("", "/messages", new MessagesWebSocket());
 		
 		// shutdown hook
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {

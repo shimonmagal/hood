@@ -1,11 +1,9 @@
 package com.hood.server.api.auth;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hood.server.model.User;
 import com.hood.server.services.DBInterface;
 import com.hood.server.session.SessionManager;
-import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +15,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -66,8 +62,7 @@ public class FacebookLoginApi
 			if (!node.has("email"))
 			{
 				logger.error("No email field in response from facebook login. Full json: {}", json);
-				
-				System.out.println("contentType: " + node.get("contentType"));
+				return Response.serverError().build();
 			}
 			
 			String email = node.get("email").asText();

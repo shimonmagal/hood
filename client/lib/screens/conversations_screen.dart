@@ -8,16 +8,16 @@ import 'package:intl/intl.dart';
 import 'package:web_socket_channel/io.dart';
 
 import 'login/session.dart';
-import 'messages_conversation_screen.dart';
+import 'conversation_messages_screen.dart';
 
-class MessagesForm extends StatefulWidget {
+class ConversationsForm extends StatefulWidget {
   @override
-  MessagesFormState createState() {
-    return new MessagesFormState();
+  ConversationsFormState createState() {
+    return new ConversationsFormState();
   }
 }
 
-class MessagesFormState extends State<MessagesForm> {
+class ConversationsFormState extends State<ConversationsForm> {
   Future<List<dynamic>> conversations;
   IOWebSocketChannel webSocketChannel;
 
@@ -128,7 +128,7 @@ class MessagesFormState extends State<MessagesForm> {
         ),
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => ConversationForm(
+              builder: (context) => ConversationMessagesForm(
                   conversation["flyerId"], "", conversation["customerUser"])));
         },
         color: Colors.grey,

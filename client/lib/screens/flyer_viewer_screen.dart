@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hood/model/flyer.dart';
 import 'package:hood/screens/login/session.dart';
-import 'package:hood/screens/messages_conversation_screen.dart';
+import 'package:hood/screens/conversation_messages_screen.dart';
 import 'package:hood/services/blob_services.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -65,7 +65,7 @@ class FlyerViewerFormState extends State<FlyerViewerForm> {
                     onPressed: () {
                       SessionHelper.internal().getSession().then((session) =>
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => ConversationForm(widget.flyer.id, widget.flyer.user, session.username))
+                          MaterialPageRoute(builder: (context) => ConversationMessagesForm(widget.flyer.id, widget.flyer.user, session.username))
                         )
                       );
                     },

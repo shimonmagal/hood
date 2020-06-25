@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hood/screens/news_screen.dart';
 import 'package:hood/screens/profile_screen.dart';
 
-import 'messages_screen.dart';
+import 'conversations_screen.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({Key key}) : super(key: key);
@@ -16,7 +16,7 @@ class MainScreenState extends State<MainScreen> {
   
   static List<Widget> _widgetOptions = <Widget>[
     NewsForm(),
-    MessagesForm(),
+    ConversationsForm(),
     Scaffold(
       body: Text('Not Implemented Yet'),
     ),

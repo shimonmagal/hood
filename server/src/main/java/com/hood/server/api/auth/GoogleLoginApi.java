@@ -1,7 +1,5 @@
 package com.hood.server.api.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -9,17 +7,13 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.hood.server.model.User;
 import com.hood.server.services.DBInterface;
 import com.hood.server.session.SessionManager;
-import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @Path("google")
 public class GoogleLoginApi

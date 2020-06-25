@@ -1,20 +1,14 @@
 package com.hood.server.session;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.hood.server.api.auth.AuthenticationFilter;
 import com.hood.server.model.Session;
 import com.hood.server.services.DBInterface;
-import org.bson.BsonDocument;
-import org.bson.BsonString;
-import org.bson.BsonValue;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 public class SessionManager
 {

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import com.hood.server.api.auth.Secured;
-import com.hood.server.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
