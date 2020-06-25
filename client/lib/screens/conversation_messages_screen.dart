@@ -59,7 +59,7 @@ class ConversationMessagesFormState extends State<ConversationMessagesForm> {
           })));
 
       scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
+        scrollController.position.maxScrollExtent + 100,
         duration: Duration(milliseconds: 600),
         curve: Curves.ease,
       );
@@ -157,7 +157,7 @@ class ConversationMessagesFormState extends State<ConversationMessagesForm> {
           textController.text = '';
           //Scrolldown the list to show the latest message
           scrollController.animateTo(
-            scrollController.position.maxScrollExtent,
+            scrollController.position.maxScrollExtent + 100,
             duration: Duration(milliseconds: 600),
             curve: Curves.ease,
           );
@@ -188,7 +188,7 @@ class ConversationMessagesFormState extends State<ConversationMessagesForm> {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: SingleChildScrollView(
+        body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             SizedBox(height: height * 0.1),
