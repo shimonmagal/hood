@@ -380,7 +380,8 @@ public class DBInterface
 			
 			AggregateIterable<Document> mongoResult = collection.aggregate(Arrays.asList(
 					Aggregates.match(new Document(op.mongoSyntax, matchConditions)),
-					new Document("$group", group)));
+					new Document("$group", group),
+					new Document("$sort", new Document("max", -1))));
 			
 			for (Document record : mongoResult)
 			{
