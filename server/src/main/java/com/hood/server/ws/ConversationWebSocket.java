@@ -44,8 +44,6 @@ public class ConversationWebSocket extends SecuredWebSocket
 	public void onConnect(WebSocket socket)
 	{
 		logger.debug("ConversationWebSocket - connected with user: {}", webSocketToUser.getIfPresent(socket));
-		
-		System.out.println("Connected!");
 	}
 	
 	@Override

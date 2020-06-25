@@ -27,9 +27,7 @@ class ConversationMessagesFormState extends State<ConversationMessagesForm> {
 
   @override
   void initState() {
-    //Initializing the message list
-    messages = List<Map<String, dynamic>>();
-    //Initializing the TextEditingController and ScrollController
+    messages = new List();
     textController = TextEditingController();
     scrollController = ScrollController();
 
@@ -51,11 +49,7 @@ class ConversationMessagesFormState extends State<ConversationMessagesForm> {
       'customerUser': widget.customerUser,
       'date': new DateTime.now().millisecondsSinceEpoch
     }));
-//    Call init before doing anything with socket
-    //  webSocketChannel..init();
-    //   Subscribe to an event to listen to
     webSocketChannel.stream.listen((jsonData) {
-      print(jsonData);
       List<dynamic> data = json.decode(jsonData);
 
       this.setState(() => messages.addAll(data.map((element) => {

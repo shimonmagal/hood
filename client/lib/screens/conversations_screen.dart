@@ -38,20 +38,16 @@ class ConversationsFormState extends State<ConversationsForm> {
         });
     webSocketChannel.sink.add(json.encode({}));
     webSocketChannel.stream.listen((jsonData) {
-      print(jsonData);
       this.setState(() {
         conversations = asyncParse(jsonData);
       });
     });
   }
 
-  Future<List> asyncParse(jsonData) async {
-    var y = json.decode(jsonData);
-
-    print("--->");
-    print(y);
-
-    return y;
+  // hack
+  Future<List<dynamic>> asyncParse(jsonData) async
+  {
+    return json.decode(jsonData);
   }
 
   @override
@@ -74,9 +70,6 @@ class ConversationsFormState extends State<ConversationsForm> {
   }
 
   Widget buildItem(BuildContext context, dynamic conversation) {
-    if (1 == 0) {
-      return Container();
-    }
     return Container(
       child: FlatButton(
         child: Row(
@@ -142,7 +135,7 @@ class ConversationsFormState extends State<ConversationsForm> {
   String toPhotoUrl(conversation) {
     String photoUrl = conversation["photoUrl"];
 
-    if (photoUrl.startsWith("http://") || photoUrl.startsWith("https://")) {
+    if (photoUrl.contains("://")) {
       return photoUrl;
     }
 
@@ -161,5 +154,11 @@ class ConversationsFormState extends State<ConversationsForm> {
     if (isToday) return new DateFormat('hh:mm aa').format(dateTime).toString();
 
     return new DateFormat('dd/MM/yy').format(dateTime).toString();
+  }
+
+  @override
+  void dispose() {
+    this.webSocketChannel.sink.close();
+    super.dispose();
   }
 }
