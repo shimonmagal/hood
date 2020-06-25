@@ -14,6 +14,12 @@ public class Message
 	private static final Logger logger = LoggerFactory.getLogger(Message.class);
 	
 	public static final String ENTITY_PLURAL_NAME = "messages";
+	public static final String CUSTOMER_USER_FIELD = "customerUser";
+	public static final String SENDER_USER_FIELD = "senderUser";
+	public static final String RECEIVER_USER_FIELD = "receiverUser";
+	public static final String FLYER_ID_FIELD = "flyerId";
+	public static final String DATE_FIELD = "date";
+	public static final String TEXT_FIELD = "text";
 	
 	private final String flyerId;
 	private final String customerUser;
@@ -35,12 +41,12 @@ public class Message
 	public static Message fromBsonObject(Document bson)
 	{
 		return new Message.Builder()
-				.withFlyerId(bson.getString("flyerId"))
-				.withCustomerUser(bson.getString("customerUser"))
-				.withSenderUser(bson.getString("senderUser"))
-				.withReceiverUser(bson.getString("receiverUser"))
-				.withDate(bson.getDate("date"))
-				.withText(bson.getString("text"))
+				.withFlyerId(bson.getString(FLYER_ID_FIELD))
+				.withCustomerUser(bson.getString(CUSTOMER_USER_FIELD))
+				.withSenderUser(bson.getString(SENDER_USER_FIELD))
+				.withReceiverUser(bson.getString(RECEIVER_USER_FIELD))
+				.withDate(bson.getDate(DATE_FIELD))
+				.withText(bson.getString(TEXT_FIELD))
 				.build();
 	}
 	
@@ -50,32 +56,32 @@ public class Message
 		
 		if (flyerId != null)
 		{
-			bson.append("flyerId", flyerId);
+			bson.append(FLYER_ID_FIELD, flyerId);
 		}
 		
 		if (customerUser != null)
 		{
-			bson.append("customerUser", customerUser);
+			bson.append(CUSTOMER_USER_FIELD, customerUser);
 		}
 		
 		if (senderUser != null)
 		{
-			bson.append("senderUser", senderUser);
+			bson.append(SENDER_USER_FIELD, senderUser);
 		}
 		
 		if (receiverUser != null)
 		{
-			bson.append("receiverUser", receiverUser);
+			bson.append(RECEIVER_USER_FIELD, receiverUser);
 		}
 		
 		if (date != null)
 		{
-			bson.append("date", date);
+			bson.append(DATE_FIELD, date);
 		}
 		
 		if (text != null)
 		{
-			bson.append("text", text);
+			bson.append(TEXT_FIELD, text);
 		}
 		
 		return bson;

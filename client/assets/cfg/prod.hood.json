@@ -1,3 +1,4 @@
 {
-  "apiUrl": "http://3.133.96.64:8080/api"
+  "apiUrl": "http://3.133.96.64:8080/api",
+  "websocketUrl": "ws://3.133.96.64:8080"
 }

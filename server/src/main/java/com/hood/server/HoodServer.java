@@ -63,6 +63,7 @@ public class HoodServer
 		}
 		
 		WebSocketEngine.getEngine().register("", "/messages", new MessageHandler());
+		WebSocketEngine.getEngine().register("", "/conversations", new ConversationHandler());
 		
 		// shutdown hook
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {

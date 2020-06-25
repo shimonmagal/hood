@@ -65,7 +65,7 @@ class FlyerViewerFormState extends State<FlyerViewerForm> {
                     onPressed: () {
                       SessionHelper.internal().getSession().then((session) =>
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => ConversationForm(widget.flyer, session.username))
+                          MaterialPageRoute(builder: (context) => ConversationForm(widget.flyer.id, widget.flyer.user, session.username))
                         )
                       );
                     },

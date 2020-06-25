@@ -15,6 +15,10 @@ public class Flyer
 	
 	public static final String ENTITY_PLURAL_NAME = "flyers";
 	public static final String LOCATION_FIELD_NAME = "location";
+	public static final String USER_FIELD_NAME = "user";
+	public static final String FLYER_ID_FIELD = "_id";
+	public static final String IMAGE_KEY_FIELD = "imageKey";
+	public static final String TITLE_FIELD = "title";
 	
 	private final String id;
 	private final String user;

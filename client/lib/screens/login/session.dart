@@ -21,8 +21,7 @@ class SessionHelper {
   static Database _db;
 
   Future<Database> get db async {
-    if(_db != null)
-      return _db;
+    if (_db != null) return _db;
     _db = await initDb();
     return _db;
   }
@@ -49,10 +48,10 @@ class SessionHelper {
     map.putIfAbsent(KEY_COLUMN, () => "session");
     map.putIfAbsent(VALUE_COLUMN, () => session.session);
 
-    int res = await dbClient.insert(TABLE_NAME, map, conflictAlgorithm: ConflictAlgorithm.replace);
+    int res = await dbClient.insert(TABLE_NAME, map,
+        conflictAlgorithm: ConflictAlgorithm.replace);
 
-    if (res <= 0)
-    {
+    if (res <= 0) {
       return false;
     }
 
@@ -60,10 +59,10 @@ class SessionHelper {
     map.putIfAbsent(KEY_COLUMN, () => "login_type");
     map.putIfAbsent(VALUE_COLUMN, () => session.loginType.toString());
 
-    res = await dbClient.insert(TABLE_NAME, map, conflictAlgorithm: ConflictAlgorithm.replace);
+    res = await dbClient.insert(TABLE_NAME, map,
+        conflictAlgorithm: ConflictAlgorithm.replace);
 
-    if (res <= 0)
-    {
+    if (res <= 0) {
       return false;
     }
 
@@ -71,45 +70,42 @@ class SessionHelper {
     map.putIfAbsent(KEY_COLUMN, () => "username");
     map.putIfAbsent(VALUE_COLUMN, () => session.username.toString());
 
-    res = await dbClient.insert(TABLE_NAME, map, conflictAlgorithm: ConflictAlgorithm.replace);
+    res = await dbClient.insert(TABLE_NAME, map,
+        conflictAlgorithm: ConflictAlgorithm.replace);
 
     return res > 0;
   }
 
-  Future<Session> getSession() async
-  {
+  Future<Session> getSession() async {
     initDb();
 
     var dbClient = await db;
 
     var result = await dbClient.rawQuery("select * from $TABLE_NAME");
 
-    if (result.length == 0)
-    {
-     return null;
+    if (result.length == 0) {
+      return null;
     }
 
     String session;
     var loginType;
     String username;
 
-    for (var row in result)
-    {
-      if (row[KEY_COLUMN] == "session")
-      {
+    for (var row in result) {
+      if (row[KEY_COLUMN] == "session") {
         session = row[VALUE_COLUMN];
-      }
-      else if (row[KEY_COLUMN] == "login_type")
-      {
-        switch (row[VALUE_COLUMN])
-        {
-          case "LOGIN_TYPES.GOOGLE": loginType = LOGIN_TYPES.GOOGLE; break;
-          case "LOGIN_TYPES.FACEBOOK": loginType = LOGIN_TYPES.FACEBOOK; break;
-          default: loginType = LOGIN_TYPES.NONE;
+      } else if (row[KEY_COLUMN] == "login_type") {
+        switch (row[VALUE_COLUMN]) {
+          case "LOGIN_TYPES.GOOGLE":
+            loginType = LOGIN_TYPES.GOOGLE;
+            break;
+          case "LOGIN_TYPES.FACEBOOK":
+            loginType = LOGIN_TYPES.FACEBOOK;
+            break;
+          default:
+            loginType = LOGIN_TYPES.NONE;
         }
-      }
-      else if (row[KEY_COLUMN] == "username")
-      {
+      } else if (row[KEY_COLUMN] == "username") {
         username = row[VALUE_COLUMN];
       }
     }
@@ -117,16 +113,15 @@ class SessionHelper {
     return new Session(session, loginType, username);
   }
 
-  Future<bool> removeSession() async
-  {
+  Future<bool> removeSession() async {
     var dbClient = await db;
     int res = await dbClient.delete(TABLE_NAME, where: "1 = 1");
 
     return res > 0;
   }
 
-  Future<Map<String, String>> authHeaders({Map<String, String> originalHeaders}) async
-  {
+  Future<Map<String, String>> authHeaders(
+      {Map<String, String> originalHeaders}) async {
     var headers = new Map<String, String>();
 
     if (originalHeaders != null) {
@@ -135,8 +130,7 @@ class SessionHelper {
 
     var session = await SessionHelper.internal().getSession();
 
-    if (session == null)
-    {
+    if (session == null) {
       return {};
     }
 
@@ -146,8 +140,7 @@ class SessionHelper {
   }
 }
 
-class Session
-{
+class Session {
   String session;
   LOGIN_TYPES loginType;
   String username;

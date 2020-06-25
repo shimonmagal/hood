@@ -2,16 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:hood/model/flyer.dart';
 import 'package:hood/screens/login/session.dart';
 import 'package:intl/intl.dart';
 import 'package:web_socket_channel/io.dart';
 
 class ConversationForm extends StatefulWidget {
-  final Flyer flyer;
+  final String flyerId;
+  final String flyerUser;
   final String customerUser;
 
-  ConversationForm(this.flyer, this.customerUser);
+  ConversationForm(this.flyerId, this.flyerUser, this.customerUser);
 
   @override
   ConversationFormState createState() => ConversationFormState();
@@ -41,12 +41,16 @@ class ConversationFormState extends State<ConversationForm> {
   void asyncInitState() async {
     currentUsername = (await SessionHelper.internal().getSession()).username;
 
-    webSocketChannel = IOWebSocketChannel.connect('${GlobalConfiguration().getString("messageUrl")}',
-        headers: {"session": (await SessionHelper.internal().getSession()).session});
+    webSocketChannel = IOWebSocketChannel.connect(
+        '${GlobalConfiguration().getString("websocketUrl")}/messages',
+        headers: {
+          "session": (await SessionHelper.internal().getSession()).session
+        });
     webSocketChannel.sink.add(json.encode({
-      'flyerId': widget.flyer.id,
+      'flyerId': widget.flyerId,
       'customerUser': widget.customerUser,
-      'date': new DateTime.now().millisecondsSinceEpoch}));
+      'date': new DateTime.now().millisecondsSinceEpoch
+    }));
 //    Call init before doing anything with socket
     //  webSocketChannel..init();
     //   Subscribe to an event to listen to
@@ -54,8 +58,11 @@ class ConversationFormState extends State<ConversationForm> {
       print(jsonData);
       List<dynamic> data = json.decode(jsonData);
 
-      this.setState(() => messages.addAll(data.map((element) =>
-        {'date': element['date'], 'text': element['text'], 'senderUser': element['senderUser']})));
+      this.setState(() => messages.addAll(data.map((element) => {
+            'date': element['date'],
+            'text': element['text'],
+            'senderUser': element['senderUser']
+          })));
 
       scrollController.animateTo(
         scrollController.position.maxScrollExtent,
@@ -69,42 +76,38 @@ class ConversationFormState extends State<ConversationForm> {
     bool amITheSender = messages[index]["senderUser"] == this.currentUsername;
 
     return Container(
-      alignment: amITheSender ? Alignment.centerLeft : Alignment.centerRight,
-      child: Container(
-        padding: const EdgeInsets.all(10.0),
-        margin: const EdgeInsets.only(bottom: 0.0, left: 15.0, right: 15.0),
-        child: ConstrainedBox(
-          constraints: new BoxConstraints(
-            minWidth: 90,
-            minHeight: 50
-          ),
-          child: DecoratedBox(
-          decoration: BoxDecoration(
-          color: amITheSender ? Color(0xff25D366): Color(0xffDCF8C6),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Stack(children: <Widget>[
-        Padding(
-        padding: const EdgeInsets.only(right: 8.0, left: 8.0, top: 8.0, bottom: 15.0),
-        child: Text(
-          messages[index]["text"],
-          style: TextStyle(color: Colors.black, fontSize: 20.0),
-        ),
-      ),
-        Positioned(
-          bottom: 5,
-          right: 10,
-          child: Text(
-            toTime(messages[index]["date"]),
-            style: TextStyle(
-                fontSize: 8, color: Colors.black.withOpacity(0.6)),
-          ),
-        ),
-      ])
-      )
-    )
-      )
-    );
+        alignment: amITheSender ? Alignment.centerLeft : Alignment.centerRight,
+        child: Container(
+            padding: const EdgeInsets.all(10.0),
+            margin: const EdgeInsets.only(bottom: 0.0, left: 15.0, right: 15.0),
+            child: ConstrainedBox(
+                constraints: new BoxConstraints(minWidth: 90, minHeight: 50),
+                child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color:
+                          amITheSender ? Color(0xff25D366) : Color(0xffDCF8C6),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Stack(children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            right: 8.0, left: 8.0, top: 8.0, bottom: 15.0),
+                        child: Text(
+                          messages[index]["text"],
+                          style: TextStyle(color: Colors.black, fontSize: 20.0),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 5,
+                        right: 10,
+                        child: Text(
+                          toTime(messages[index]["date"]),
+                          style: TextStyle(
+                              fontSize: 8,
+                              color: Colors.black.withOpacity(0.6)),
+                        ),
+                      ),
+                    ])))));
   }
 
   Widget buildMessageList() {
@@ -144,13 +147,19 @@ class ConversationFormState extends State<ConversationForm> {
           //Send the message as JSON data to send_message event
           webSocketChannel.sink.add(json.encode({
             'text': textController.text,
-            'flyerId': widget.flyer.id,
+            'flyerId': widget.flyerId,
             'customerUser': widget.customerUser,
-            'receiverUser': (widget.customerUser == currentUsername) ? widget.customerUser : widget.flyer.user,
-            'date': new DateTime.now().millisecondsSinceEpoch}));
+            'receiverUser': (widget.customerUser == currentUsername)
+                ? widget.flyerUser
+                : widget.customerUser,
+            'date': new DateTime.now().millisecondsSinceEpoch
+          }));
           //Add the message to the list
-         this.setState(() => messages.add({'date': new DateTime.now().millisecondsSinceEpoch, 'text': textController.text,
-            'senderUser': currentUsername}));
+          this.setState(() => messages.add({
+                'date': new DateTime.now().millisecondsSinceEpoch,
+                'text': textController.text,
+                'senderUser': currentUsername
+              }));
           textController.text = '';
           //Scrolldown the list to show the latest message
           scrollController.animateTo(
@@ -197,18 +206,23 @@ class ConversationFormState extends State<ConversationForm> {
     );
   }
 
-  String toTime(int epochMillis)
-  {
-      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(epochMillis).toUtc().toLocal();
+  String toTime(int epochMillis) {
+    DateTime dateTime =
+        DateTime.fromMillisecondsSinceEpoch(epochMillis).toUtc().toLocal();
 
-      final now = DateTime.now();
-      bool isToday = (now.day == dateTime.day &&
-          now.month == dateTime.month &&
-          now.year == dateTime.year);
+    final now = DateTime.now();
+    bool isToday = (now.day == dateTime.day &&
+        now.month == dateTime.month &&
+        now.year == dateTime.year);
 
-      if (isToday)
-        return new DateFormat('hh:mm aa').format(dateTime).toString();
+    if (isToday) return new DateFormat('hh:mm aa').format(dateTime).toString();
 
-      return new DateFormat('dd/MM/yy hh:mm aa').format(dateTime).toString();
+    return new DateFormat('dd/MM/yy hh:mm aa').format(dateTime).toString();
+  }
+
+  @override
+  void dispose() {
+    this.webSocketChannel.sink.close();
+    super.dispose();
   }
 }

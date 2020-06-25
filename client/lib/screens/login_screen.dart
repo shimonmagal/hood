@@ -23,8 +23,10 @@ class LoginViewState extends State<LoginView> {
   void initState() {
     super.initState();
 
-    this.facebookProvider = new FacebookLoginView(this.loginType, this.logIn, this.logOut);
-    this.googleProvider = new GoogleLoginView(this.loginType, this.logIn, this.logOut);
+    this.facebookProvider =
+        new FacebookLoginView(this.loginType, this.logIn, this.logOut);
+    this.googleProvider =
+        new GoogleLoginView(this.loginType, this.logIn, this.logOut);
 
     useSessionIfPossible();
   }
@@ -35,10 +37,7 @@ class LoginViewState extends State<LoginView> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            this.facebookProvider,
-            this.googleProvider
-          ],
+          children: <Widget>[this.facebookProvider, this.googleProvider],
         ),
       ),
     );
@@ -51,7 +50,8 @@ class LoginViewState extends State<LoginView> {
 
     String username = user["email"];
 
-    if (await SessionHelper.internal().saveSession(new Session(session, loginType, username))) {
+    if (await SessionHelper.internal()
+        .saveSession(new Session(session, loginType, username))) {
       goToApp(context, user, loginType);
     }
   }
@@ -70,16 +70,16 @@ class LoginViewState extends State<LoginView> {
         break;
     }
 
-    Navigator.pushNamed(
-        context, '/', arguments: {"userData": userData, "provider": provider});
+    Navigator.pushNamed(context, '/',
+        arguments: {"userData": userData, "provider": provider});
   }
 
   logOut(context) async {
-    var response = await http.delete('${GlobalConfiguration().getString("apiUrl")}/session',
+    var response = await http.delete(
+        '${GlobalConfiguration().getString("apiUrl")}/session',
         headers: await SessionHelper.internal().authHeaders());
 
-    if (response.statusCode != 200)
-    {
+    if (response.statusCode != 200) {
       return;
     }
 
@@ -92,22 +92,22 @@ class LoginViewState extends State<LoginView> {
 
   void useSessionIfPossible() async {
     var session = await SessionHelper.internal().getSession();
-    
+
     if (session == null) {
       return;
     }
 
-    var response = await http.get('${GlobalConfiguration().getString("apiUrl")}/session',
+    var response = await http.get(
+        '${GlobalConfiguration().getString("apiUrl")}/session',
         headers: {"session": session.session});
-    
+
     if (response.statusCode == 200) {
       logIn(session.loginType, session.session, json.decode(response.body));
     }
   }
 }
 
-abstract class LoginProvider
-{
+abstract class LoginProvider {
   logout(BuildContext context);
 }
 

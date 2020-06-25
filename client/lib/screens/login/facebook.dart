@@ -6,7 +6,7 @@ import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:hood/screens/login_screen.dart';
 import 'package:global_configuration/global_configuration.dart';
 
-class FacebookLoginView extends StatefulWidget implements LoginProvider{
+class FacebookLoginView extends StatefulWidget implements LoginProvider {
   final LOGIN_TYPES loginType;
   final Function logInCallback;
   final Function logOutCallback;
@@ -27,7 +27,7 @@ class FacebookLoginView extends StatefulWidget implements LoginProvider{
   }
 }
 
-class FacebookLoginViewState extends State<FacebookLoginView>{
+class FacebookLoginViewState extends State<FacebookLoginView> {
   Map userProfile;
 
   _loginWithFB(context) async {
@@ -37,8 +37,8 @@ class FacebookLoginViewState extends State<FacebookLoginView>{
       case FacebookLoginStatus.loggedIn:
         final token = result.accessToken.token;
 
-        final serverResponse = await http
-            .get('${GlobalConfiguration().getString("apiUrl")}/facebook?access_token=${token}');
+        final serverResponse = await http.get(
+            '${GlobalConfiguration().getString("apiUrl")}/facebook?access_token=${token}');
 
         if (serverResponse.statusCode != 200) {
           widget.logOutCallback(context);
@@ -46,14 +46,15 @@ class FacebookLoginViewState extends State<FacebookLoginView>{
         }
 
         final profile = jsonDecode(serverResponse.body);
-        
+
         setState(() {
           userProfile = profile;
         });
 
         userProfile["picture"] = userProfile["picture"]["data"]["url"];
 
-        widget.logInCallback(LOGIN_TYPES.FACEBOOK, serverResponse.headers['session'], profile);
+        widget.logInCallback(
+            LOGIN_TYPES.FACEBOOK, serverResponse.headers['session'], profile);
 
         break;
 
@@ -70,12 +71,12 @@ class FacebookLoginViewState extends State<FacebookLoginView>{
   Widget build(BuildContext context) {
     return Center(
       child: OutlineButton(
-              child: FacebookSignInButton(
-                onPressed: () {
-                  _loginWithFB(context);
-                },
-              ),
-            ),
+        child: FacebookSignInButton(
+          onPressed: () {
+            _loginWithFB(context);
+          },
+        ),
+      ),
     );
   }
 }

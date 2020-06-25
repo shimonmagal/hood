@@ -113,8 +113,8 @@ public class FlyersApi
 			
 			
 			Map<String, DBInterface.OperatorAndValue> fieldToOperatorAndValue = Maps.newHashMap();
-			fieldToOperatorAndValue.put("user", DBInterface.OperatorAndValue.of(DBInterface.Operator.EQUALS, user));
-			fieldToOperatorAndValue.put("id", DBInterface.OperatorAndValue.of(DBInterface.Operator.EQUALS, flyerId));
+			fieldToOperatorAndValue.put(Flyer.USER_FIELD_NAME, DBInterface.OperatorAndValue.of(DBInterface.Operator.EQUALS, user));
+			fieldToOperatorAndValue.put(Flyer.FLYER_ID_FIELD, DBInterface.OperatorAndValue.of(DBInterface.Operator.EQUALS, flyerId));
 			
 			List<Document> documents = DBInterface.get().query(Flyer.ENTITY_PLURAL_NAME, DBInterface.LogicalOperator.AND,
 					fieldToOperatorAndValue);

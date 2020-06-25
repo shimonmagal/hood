@@ -9,6 +9,8 @@ public class User
 	private static final Logger logger = LoggerFactory.getLogger(User.class);
 	
 	public static final String ENTITY_PLURAL_NAME = "users";
+	public static final String USERNAME_FIELD = "email";
+	public static final String PICTURE_FIELD = "picture";
 	
 	private final String email;
 	private final String picture;

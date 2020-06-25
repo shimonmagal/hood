@@ -6,7 +6,7 @@ import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:hood/screens/login_screen.dart';
 import 'package:global_configuration/global_configuration.dart';
 
-class GoogleLoginView extends StatefulWidget implements LoginProvider{
+class GoogleLoginView extends StatefulWidget implements LoginProvider {
   final LOGIN_TYPES loginType;
   final Function logInCallback;
   final Function logOutCallback;
@@ -35,7 +35,8 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
   GoogleLoginViewState();
 
   _loginWithGoogle(context) async {
-    final GoogleSignInAccount googleSignInAccount = await widget.googleSignIn.signIn();
+    final GoogleSignInAccount googleSignInAccount =
+        await widget.googleSignIn.signIn();
 
     if (googleSignInAccount == null) {
       return;
@@ -59,19 +60,20 @@ class GoogleLoginViewState extends State<GoogleLoginView> {
       userProfile = profile;
     });
 
-    widget.logInCallback(LOGIN_TYPES.GOOGLE, serverResponse.headers['session'], userProfile);
+    widget.logInCallback(
+        LOGIN_TYPES.GOOGLE, serverResponse.headers['session'], userProfile);
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-    	child: OutlineButton(
-              child: GoogleSignInButton(
-                onPressed: () {
-                  _loginWithGoogle(context);
-                },
-              ),
-            ),
+      child: OutlineButton(
+        child: GoogleSignInButton(
+          onPressed: () {
+            _loginWithGoogle(context);
+          },
+        ),
+      ),
     );
   }
 }

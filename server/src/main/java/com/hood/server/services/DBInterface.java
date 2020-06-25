@@ -1,18 +1,18 @@
 package com.hood.server.services;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.hood.server.model.Message;
 import com.hood.server.model.Session;
 import com.hood.server.model.User;
 import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.*;
-import com.mongodb.client.model.changestream.ChangeStreamDocument;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ public class DBInterface
 	private static final Logger logger = LoggerFactory.getLogger(DBInterface.class);
 	
 	private static DBInterface instance;
-
+	
 	public enum LogicalOperator
 	{
 		AND("$and"),
@@ -167,7 +167,7 @@ public class DBInterface
 			flyers.createIndex(Indexes.geo2dsphere("location"));
 			
 			MongoCollection<Document> users = getHoodDatabase().getCollection(User.ENTITY_PLURAL_NAME);
-			users.createIndex(Indexes.text("email"), new IndexOptions().unique(true));
+			users.createIndex(Indexes.ascending("email"), new IndexOptions().unique(true));
 			
 			MongoCollection<Document> sessions = getHoodDatabase().getCollection(Session.ENTITY_PLURAL_NAME);
 			sessions.createIndex(Indexes.text("session"), new IndexOptions().unique(true));
@@ -236,6 +236,15 @@ public class DBInterface
 		}
 	}
 	
+	
+	public List<Document> query(String collectionName, String field, OperatorAndValue opAndValue)
+	{
+		Map<String, OperatorAndValue> fieldToOperatorAndValue = Maps.newHashMap();
+		fieldToOperatorAndValue.put(field, opAndValue);
+		
+		return query(collectionName, LogicalOperator.AND, fieldToOperatorAndValue);
+	}
+	
 	public List<Document> query(String collectionName, LogicalOperator logicOp, Map<String, OperatorAndValue> fieldToOperatorAndValue)
 	{
 		BasicDBList compoundQuery = new BasicDBList();
@@ -243,7 +252,8 @@ public class DBInterface
 		for (Map.Entry<String, OperatorAndValue> fieldEntry : fieldToOperatorAndValue.entrySet())
 		{
 			// only equals supported now - todo
-			DBObject clause = new BasicDBObject(fieldEntry.getKey(), fieldEntry.getValue().val);
+			String val = fieldEntry.getValue().val;
+			DBObject clause = new BasicDBObject(fieldEntry.getKey(), fieldEntry.getKey().equals("_id") ? new ObjectId(val) : val);
 			compoundQuery.add(clause);
 		}
 		
@@ -337,6 +347,53 @@ public class DBInterface
 		}
 		
 		return false;
+	}
+	
+	public List<Document> findRecentTwoOrConditions(String collectionName, LogicalOperator op, String fieldA, List<String> valuesA, String fieldB, List<String> valuesB, String dateField, String ... moreFieldsToRetrieve)
+	{
+		try
+		{
+			MongoCollection<Document> collection = getHoodDatabase().getCollection(collectionName);
+			
+			List<Document> matchConditions = Lists.newLinkedList();
+			
+			for (String value : valuesA)
+			{
+				matchConditions.add(new Document(fieldA, value));
+			}
+			
+			for (String value : valuesB)
+			{
+				matchConditions.add(new Document(fieldB, value));
+			}
+			
+			List<Document> result = Lists.newArrayList();
+			
+			Document group = new Document("_id", new Document(fieldA, "$" + fieldA)
+					.append(fieldB, "$" + fieldB))
+					.append("max", new Document("$max", "$" + dateField));
+			
+			for (String field : moreFieldsToRetrieve)
+			{
+				group = group.append(field, new Document("$last", "$" + field));
+			}
+			
+			AggregateIterable<Document> mongoResult = collection.aggregate(Arrays.asList(
+					Aggregates.match(new Document(op.mongoSyntax, matchConditions)),
+					new Document("$group", group)));
+			
+			for (Document record : mongoResult)
+			{
+				result.add(record);
+			}
+			
+			return result;
+		}
+		catch (Exception e)
+		{
+			logger.info("findRecentTwoOrConditions failed for collection: {}", collectionName, e);
+			return null;
+		}
 	}
 	
 	public boolean watch(String collectionName, Consumer<Message> action)

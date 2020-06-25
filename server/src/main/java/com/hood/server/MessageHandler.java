@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
 public class MessageHandler extends WebSocketApplication
 {
 	private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
-
+	
 	private Cache<WebSocket, String> webSocketToUser = CacheBuilder.newBuilder().build();
 	private Cache<String, WebSocket> conversationIdToWebsocket = CacheBuilder.newBuilder().build();
-
+	
 	private Consumer<Message> messageConsumer = message -> {
 		String flyerId = message.getFlyerId();
 		String customerUser = message.getCustomerUser();
@@ -151,8 +151,8 @@ public class MessageHandler extends WebSocketApplication
 		}
 		else
 		{
-			String customerUser = jsonObj.get("customerUser").asText();
-			String flyerId = jsonObj.get("flyerId").asText();
+			String customerUser = jsonObj.get(Message.CUSTOMER_USER_FIELD).asText();
+			String flyerId = jsonObj.get(Message.FLYER_ID_FIELD).asText();
 			
 			String conversationId = String.join("#", flyerId, customerUser, currentUsername);
 			
