@@ -12,6 +12,9 @@ repositories {
 dependencies {
     compile 'org.cfg4j:cfg4j-core:4.4.1'
     compile 'org.mongodb:mongodb-driver-sync:4.0.3'
+
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
 }
 
 test {

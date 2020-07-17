@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+	project("db-interface")
 	compile 'org.glassfish.jersey.containers:jersey-container-jdk-http:2.29.1'
 	compile 'org.glassfish.jersey.core:jersey-server:2.29.1'
 	compile 'org.glassfish.jersey.media:jersey-media-multipart:2.29.1'
