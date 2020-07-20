@@ -18,8 +18,6 @@ import config.HoodConfig;
 
 public class HoodServer
 {
-	private static final int DEFAULT_PORT = 8080;
-	
 	private static final Logger logger = LoggerFactory.getLogger(HoodServer.class);
 	
 	private static boolean initializeServices()
