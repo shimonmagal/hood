@@ -2,6 +2,7 @@ package com.hood.server.session;
 
 import com.hood.server.api.auth.AuthenticationFilter;
 import com.hood.server.model.Session;
+import com.hood.server.services.DBInterface;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,6 @@ public class SessionManager
     public static String get(String sessionId)
     {
         Session session = new Session(sessionId);
-
         Document result = DBInterface.get().getDocument(SESSION_COLLECTION_NAME, session.toBsonObject());
         
         if (result == null)
