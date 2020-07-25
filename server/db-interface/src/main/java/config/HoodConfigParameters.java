@@ -1,4 +1,4 @@
-package config;
+package com.hood.server.config;
 
 public interface HoodConfigParameters
 {
