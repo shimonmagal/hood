@@ -1,4 +1,4 @@
-package config;
+package com.hood.server.config;
 
 import java.util.concurrent.TimeUnit;
 

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.hood.server.services.DBInterface;
 import com.hood.server.services.BlobInterface;
 
-import config.HoodConfig;
+import com.hood.server.config.HoodConfig;
 
 public class HoodServer
 {

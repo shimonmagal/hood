@@ -1,3 +1,5 @@
+package com.hood.server.services;
+
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -22,7 +24,7 @@ import org.bson.conversions.Bson;
 
 import com.hood.server.model.Flyer;
 
-import config.HoodConfig;
+import com.hood.server.config.HoodConfig;
 
 public class DBInterface
 {
