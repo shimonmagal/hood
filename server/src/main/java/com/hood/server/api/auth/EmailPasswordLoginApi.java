@@ -3,12 +3,14 @@ package com.hood.server.api.auth;
 import com.hood.server.model.User;
 import com.hood.server.services.DBInterface;
 import com.hood.server.session.SessionManager;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("emailpassword")

@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import config.HoodConfig;
+import com.hood.server.config.HoodConfig;
 
 public class BlobInterface
 {
