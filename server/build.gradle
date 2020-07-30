@@ -26,7 +26,6 @@ dependencies {
 	compile 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
 	compile 'org.mongodb:mongodb-driver-sync:4.0.3'
 	compile 'org.cfg4j:cfg4j-core:4.4.1'
-	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
 	compile 'org.apache.commons:commons-lang3:3.10'
 
 	compile 'org.glassfish.grizzly:grizzly-http-server:2.4.4'
